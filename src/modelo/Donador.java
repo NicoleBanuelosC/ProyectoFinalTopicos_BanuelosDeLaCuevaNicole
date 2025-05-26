@@ -38,7 +38,7 @@ public class Donador {
         this.estado = estado;
         this.pais = pais;
         this.categoria = categoria;
-        this.añoGraduacion = añoGraduacion;
+        this.añoGraduacion = String.valueOf(añoGraduacion);
         this.nombreConyuge = nombreConyuge;
         this.idCirculo = idCirculo;
         this.idCoordinador = idCoordinador;
@@ -84,7 +84,7 @@ public class Donador {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public int getAñoGraduacion() { return añoGraduacion; }
+    public String getAñoGraduacion() { return añoGraduacion; }
     public void setAñoGraduacion(String añoGraduacion) { this.añoGraduacion = añoGraduacion; }
 
     public String getNombreConyuge() { return nombreConyuge; }
