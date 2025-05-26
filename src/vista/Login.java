@@ -160,7 +160,7 @@ public class Login extends JFrame {
 
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "¡Bienvenido a Colecta de Universidad!");
-                //new MainScreen().setVisible(true); //para que pase a la principal al iniciar login (supongamos que se llama MainScreen)
+                new MainScreen().setVisible(true); //para que pase a la principal al iniciar login (supongamos que se llama MainScreen)
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);

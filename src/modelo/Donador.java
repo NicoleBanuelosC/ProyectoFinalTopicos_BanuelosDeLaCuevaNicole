@@ -22,7 +22,7 @@ public class Donador {
 
     public Donador (String idDonador, String nombre, String primerApellido, String segundoApellido, String telefono,
                     String numeroVivienda, String calle, String colonia, String municipioCiudad, String codigoPostal,
-                    String estado, String pais, String categoria, String añoGraduacion, String nombreConyuge,
+                    String estado, String pais, String categoria, int añoGraduacion, String nombreConyuge,
                     String idCirculo, String idCoordinador, String idLlamador){
 
         this.idDonador = idDonador;
@@ -84,7 +84,7 @@ public class Donador {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public String getAñoGraduacion() { return añoGraduacion; }
+    public int getAñoGraduacion() { return añoGraduacion; }
     public void setAñoGraduacion(String añoGraduacion) { this.añoGraduacion = añoGraduacion; }
 
     public String getNombreConyuge() { return nombreConyuge; }
