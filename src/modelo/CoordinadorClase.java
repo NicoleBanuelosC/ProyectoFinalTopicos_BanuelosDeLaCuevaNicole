@@ -5,14 +5,14 @@ public class CoordinadorClase {
     private String nombre;
     private String primerApellido;
     private String segundoApellido;
-    private String telefono;
+    private String idCirculo;
 
-    public CoordinadorClase(String idCoordinador, String nombre, String primerApellido, String segundoApellido, String telefono) {
+    public CoordinadorClase(String idCoordinador, String nombre, String primerApellido, String segundoApellido, String idCirculo) {
         this.idCoordinador = idCoordinador;
         this.nombre = nombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
-        this.telefono = telefono;
+        this.idCirculo = idCirculo;
     }//public CoordinadorClase
 
     public String getIdCoordinador() { return idCoordinador; }
@@ -27,7 +27,7 @@ public class CoordinadorClase {
     public String getSegundoApellido() { return segundoApellido; }
     public void setSegundoApellido(String segundoApellido) { this.segundoApellido = segundoApellido; }
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getIdCirculo() { return idCirculo; }
+    public void setIdCirculo(String idCirculo) { this.idCirculo = idCirculo; }
 
 }//CoordinadorClase

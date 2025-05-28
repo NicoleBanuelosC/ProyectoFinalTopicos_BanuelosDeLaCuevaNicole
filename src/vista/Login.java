@@ -159,7 +159,7 @@ public class Login extends JFrame {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                JOptionPane.showMessageDialog(this, "¡Bienvenido a Colecta de Universidad!");
+                JOptionPane.showMessageDialog(this, "¡Bienvenidx a Colecta de Universidad!");
                 new MainScreen().setVisible(true); //para que pase a la principal al iniciar login (supongamos que se llama MainScreen)
                 dispose();
             } else {

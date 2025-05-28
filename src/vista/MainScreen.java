@@ -7,7 +7,7 @@ public class MainScreen extends JFrame {
     private JDesktopPane desktopPane;
 
     public MainScreen() {
-        // Configuración de la ventana principal
+        // configuración de la ventana principal
         setTitle("Colecta de Universidad - Sistema de Gestión");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
