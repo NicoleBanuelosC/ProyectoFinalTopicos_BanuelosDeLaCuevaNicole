@@ -268,5 +268,5 @@ public class ABCCCirculoDonativo extends JInternalFrame {
         tableCirculos.clearSelection();
         cargarTodosLosCirculos(); // recargar todos los círculos para mantener la tabla actualizada
     }//Restablecer
-    
+
 }//ABCC CIrculo

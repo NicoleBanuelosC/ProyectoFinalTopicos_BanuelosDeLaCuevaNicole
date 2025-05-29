@@ -88,7 +88,7 @@ public class ABCCCoordinadorClase extends JInternalFrame {
 
         add(panelSuperior, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-    }//public coordinador
+    }//public ABBC
 
     private void cargarTodosLosCoordinadores() {
         try {
@@ -99,47 +99,86 @@ public class ABCCCoordinadorClase extends JInternalFrame {
                         coordinador.getIdCoordinador(),
                         coordinador.getNombre(),
                         coordinador.getPrimerApellido(),
-                        coordinador.getIdCirculo()
+                        coordinador.getIdCirculo() != null ? coordinador.getIdCirculo() : ""
                 };
                 tableModel.addRow(fila);
             }//for
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar coordinadores: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar los coordinadores: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }//Catch
 
-    }//Cargartodos
+    }//CargarTodasLasCoordinador
 
     private void cargarSeleccion() {
         int filaSeleccionada = tableCoordinadores.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Por favor, seleccione un coordinador de la tabla");
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un coordinador de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }//if
 
-        String idCoordinador = String.valueOf(tableModel.getValueAt(filaSeleccionada, 0));
+        String idCoordinador = tableModel.getValueAt(filaSeleccionada, 0).toString();
         try {
             CoordinadorClase coordinador = coordinadorDAO.consulta(idCoordinador);
-            if (coordinador == null) {
-                JOptionPane.showMessageDialog(this, "No se encontró un coordinador con ese ID");
-                return;
-            }//if
-            mostrarCoordinador(coordinador);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar el coordinador: " + ex.getMessage());
-        }//catcg
+            if (coordinador != null) {
+                mostrarCoordinador(coordinador);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró un coordinador con ese ID", "Error", JOptionPane.ERROR_MESSAGE);
+            }//else
 
-    }//CargarSeleccion
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al cargar el coordinador: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//Cactg
+
+    }//cargarSleccion
 
     private boolean validarCamposObligatorios() {
-        if (txtIdCoordinador.getText().trim().isEmpty() ||
-                txtNombre.getText().trim().isEmpty() ||
-                txtPrimerApellido.getText().trim().isEmpty() ||
-                txtIdCirculo.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Los campos ID Coordinador, Nombre, Primer Apellido e ID Círculo son obligatorios");
-            return false;
+        StringBuilder mensaje = new StringBuilder();
+        boolean valido = true;
+
+        if (txtIdCoordinador.getText().trim().isEmpty()) {
+            mensaje.append("ID Coordinador es obligatorio\n");
+            valido = false;
+
+        } else if (!txtIdCoordinador.getText().trim().matches("\\d+")) {
+            mensaje.append("El ID Coordinador debe contener solo números\n");
+            valido = false;
+
+        } else if (txtIdCoordinador.getText().trim().length() > 10) {
+            mensaje.append("ID Coordinador debe tener máximo 10 caracteres\n");
+            valido = false;
+        }//else if
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mensaje.append("Nombre es obligatorio\n");
+            valido = false;
         }//if
-        return true;
-    }//validarCoompas
+
+        if (txtPrimerApellido.getText().trim().isEmpty()) {
+            mensaje.append("Primer Apellido es obligatorio\n");
+            valido = false;
+        }//if
+
+        if (txtIdCirculo.getText().trim().isEmpty()) {
+            mensaje.append("ID Círculo es obligatorio\n");
+            valido = false;
+
+        } else if (!txtIdCirculo.getText().trim().matches("\\d+")) {
+            mensaje.append("El ID Círculo debe contener solo números\n");
+            valido = false;
+
+        } else if (txtIdCirculo.getText().trim().length() > 10) {
+            mensaje.append("ID Círculo debe tener máximo 10 caracteres\n");
+            valido = false;
+        }//else if
+
+        if (!valido) {
+            JOptionPane.showMessageDialog(this, mensaje.toString(), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }//if
+
+        return valido;
+    }//validarCamposObligatorios
 
     private void alta() {
         try {
@@ -149,31 +188,34 @@ public class ABCCCoordinadorClase extends JInternalFrame {
                     txtIdCoordinador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtIdCirculo.getText().trim()
             );
             coordinadorDAO.alta(coordinador);
-            JOptionPane.showMessageDialog(this, "Alta exitosa");
+            JOptionPane.showMessageDialog(this, "Alta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosCoordinadores();
             reestablecer();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al dar de alta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }//Catch
 
     }//alta
 
     private void baja() {
-        String idCoordinador = null;
+        String idCoordinador = txtIdCoordinador.getText().trim();
         int filaSeleccionada = tableCoordinadores.getSelectedRow();
         if (filaSeleccionada != -1) {
-            idCoordinador = String.valueOf(tableModel.getValueAt(filaSeleccionada, 0));
-        } else {
-            if (txtIdCoordinador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del coordinador o seleccione uno de la tabla");
-                return;
-            }//if
-            idCoordinador = txtIdCoordinador.getText().trim();
-        }//Else
+            idCoordinador = tableModel.getValueAt(filaSeleccionada, 0).toString();
+        } else if (idCoordinador.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del coordinador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//Else if
+
+        if (!idCoordinador.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "El ID Coordinador debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
 
         int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el coordinador con ID " + idCoordinador + "?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
@@ -182,11 +224,12 @@ public class ABCCCoordinadorClase extends JInternalFrame {
 
         try {
             coordinadorDAO.baja(idCoordinador);
-            JOptionPane.showMessageDialog(this, "Baja exitosa");
+            JOptionPane.showMessageDialog(this, "Baja exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosCoordinadores();
             reestablecer();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al dar de baja: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }//Catch
 
     }//baja
@@ -199,45 +242,65 @@ public class ABCCCoordinadorClase extends JInternalFrame {
                     txtIdCoordinador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtIdCirculo.getText().trim()
             );
             coordinadorDAO.cambio(coordinador);
-            JOptionPane.showMessageDialog(this, "Cambio exitoso");
+            JOptionPane.showMessageDialog(this, "Cambio exitoso", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosCoordinadores();
             reestablecer();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-        }//Catch
+            JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//catch
 
     }//Cambio
 
     private void consultaPorId() {
         try {
-            if (txtIdCoordinador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del coordinador");
+            String idCoordinador = txtIdCoordinador.getText().trim();
+            if (idCoordinador.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del coordinador", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
 
-            CoordinadorClase coordinador = coordinadorDAO.consulta(txtIdCoordinador.getText().trim());
-            if (coordinador == null) {
-                JOptionPane.showMessageDialog(this, "No se encontró un coordinador con ese ID");
+            if (!idCoordinador.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "El ID Coordinador debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
-            mostrarCoordinador(coordinador);
-            JOptionPane.showMessageDialog(this, "Consulta exitosa");
+
+            CoordinadorClase coordinador = coordinadorDAO.consulta(idCoordinador);
+            if (coordinador != null) {
+                mostrarCoordinador(coordinador);
+                List<CoordinadorClase> coordinadores = List.of(coordinador);
+                tableModel.setRowCount(0);
+                for (CoordinadorClase coord : coordinadores) {
+                    Object[] fila = {
+                            coord.getIdCoordinador(),
+                            coord.getNombre(),
+                            coord.getPrimerApellido(),
+                            coord.getIdCirculo() != null ? coord.getIdCirculo() : ""
+                    };
+                    tableModel.addRow(fila);
+                }//for
+                JOptionPane.showMessageDialog(this, "Consulta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró un coordinador con ese ID", "Error", JOptionPane.ERROR_MESSAGE);
+            }//else
+
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }//catch
 
-    }//ConsultarPorId
+    }//consultaPorID
 
     private void mostrarCoordinador(CoordinadorClase coordinador) {
         txtIdCoordinador.setText(coordinador.getIdCoordinador());
         txtNombre.setText(coordinador.getNombre());
         txtPrimerApellido.setText(coordinador.getPrimerApellido());
-        txtSegundoApellido.setText(coordinador.getSegundoApellido());
-        txtIdCirculo.setText(coordinador.getIdCirculo());
+        txtSegundoApellido.setText(coordinador.getSegundoApellido() != null ? coordinador.getSegundoApellido() : "");
+        txtIdCirculo.setText(coordinador.getIdCirculo() != null ? coordinador.getIdCirculo() : "");
     }//mostrarCoordinador
 
     private void reestablecer() {
@@ -247,6 +310,7 @@ public class ABCCCoordinadorClase extends JInternalFrame {
         txtSegundoApellido.setText("");
         txtIdCirculo.setText("");
         tableCoordinadores.clearSelection();
-    }//reestablecer
+        cargarTodosLosCoordinadores();
+    }//Restablecer
 
-}//ABCC Coordinador
+}//ABCC Cordinador

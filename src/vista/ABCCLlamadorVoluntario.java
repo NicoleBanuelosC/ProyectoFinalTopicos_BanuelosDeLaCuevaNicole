@@ -88,7 +88,7 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
 
         add(panelSuperior, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-    }//public
+    }//opublic
 
     private void cargarTodosLosLlamadores() {
         try {
@@ -99,16 +99,15 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
                         llamador.getIdLlamador(),
                         llamador.getNombre(),
                         llamador.getPrimerApellido(),
-                        llamador.getSegundoApellido(),
+                        llamador.getSegundoApellido() != null ? llamador.getSegundoApellido() : "",
                         llamador.getTelefono()
                 };
                 tableModel.addRow(fila);
-            }//For
+            }//for
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar llamadores: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar los llamadores: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
-
+        }//Catcg
     }//CargarTodos
 
     private void cargarSeleccion() {
@@ -128,21 +127,53 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
             }//ifelse
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al cargar el llamador: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace(); // Para depuración
+            ex.printStackTrace();
         }//Catch
 
     }//cargarSeleccion
 
     private boolean validarCamposObligatorios() {
-        if (txtIdLlamador.getText().trim().isEmpty() ||
-                txtNombre.getText().trim().isEmpty() ||
-                txtPrimerApellido.getText().trim().isEmpty() ||
-                txtTelefono.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Los campos ID Llamador, Nombre, Primer Apellido y Teléfono son obligatorios", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        StringBuilder mensaje = new StringBuilder();
+        boolean valido = true;
+
+        if (txtIdLlamador.getText().trim().isEmpty()) {
+            mensaje.append("ID Llamador es obligatorio\n");
+            valido = false;
+
+        } else if (!txtIdLlamador.getText().trim().matches("\\d+")) {
+            mensaje.append("El ID Llamador debe contener solo números\n");
+            valido = false;
+
+        } else if (txtIdLlamador.getText().trim().length() > 10) {
+            mensaje.append("ID Llamador debe tener máximo 10 caracteres\n");
+            valido = false;
+        }//Else if
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mensaje.append("Nombre es obligatorio\n");
+            valido = false;
         }//if
-        return true;
-    }//validar campos
+
+        if (txtPrimerApellido.getText().trim().isEmpty()) {
+            mensaje.append("Primer Apellido es obligatorio\n");
+            valido = false;
+        }//if
+
+        if (txtTelefono.getText().trim().isEmpty()) {
+            mensaje.append("Teléfono es obligatorio\n");
+            valido = false;
+
+        } else if (!txtTelefono.getText().trim().matches("\\d+")) {
+            mensaje.append("El teléfono debe contener solo números\n");
+            valido = false;
+        }//else if
+
+        if (!valido) {
+            JOptionPane.showMessageDialog(this, mensaje.toString(), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }//if
+
+        return valido;
+    }//ValidarCampos
 
     private void alta() {
         try {
@@ -152,7 +183,7 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
                     txtIdLlamador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtTelefono.getText().trim()
             );
             llamadorDAO.alta(llamador);
@@ -162,21 +193,24 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al dar de alta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
+        }//Catch
+
     }//alta
 
     private void baja() {
-        String idLlamador = null;
+        String idLlamador = txtIdLlamador.getText().trim();
         int filaSeleccionada = tableLlamadores.getSelectedRow();
         if (filaSeleccionada != -1) {
             idLlamador = tableModel.getValueAt(filaSeleccionada, 0).toString();
-        } else {
-            if (txtIdLlamador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del llamador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
-            }//if
-            idLlamador = txtIdLlamador.getText().trim();
-        }//Else
+        } else if (idLlamador.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del llamador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//Else if
+
+        if (!idLlamador.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "El ID Llamador debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
 
         int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el llamador con ID " + idLlamador + "?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
@@ -191,7 +225,7 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al dar de baja: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
+        }//try catch
 
     }//baja
 
@@ -203,7 +237,7 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
                     txtIdLlamador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtTelefono.getText().trim()
             );
             llamadorDAO.cambio(llamador);
@@ -213,38 +247,56 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//ctagc
+        }//Catch
 
     }//cambio
 
     private void consultaPorId() {
         try {
-            if (txtIdLlamador.getText().trim().isEmpty()) {
+            String idLlamador = txtIdLlamador.getText().trim();
+            if (idLlamador.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del llamador", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
 
-            LlamadorVoluntario llamador = llamadorDAO.consulta(txtIdLlamador.getText().trim());
+            if (!idLlamador.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "El ID Llamador debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }//if
+
+            LlamadorVoluntario llamador = llamadorDAO.consulta(idLlamador);
             if (llamador != null) {
                 mostrarLlamador(llamador);
+                List<LlamadorVoluntario> llamadores = List.of(llamador);
+                tableModel.setRowCount(0);
+                for (LlamadorVoluntario ll : llamadores) {
+                    Object[] fila = {
+                            ll.getIdLlamador(),
+                            ll.getNombre(),
+                            ll.getPrimerApellido(),
+                            ll.getSegundoApellido() != null ? ll.getSegundoApellido() : "",
+                            ll.getTelefono()
+                    };
+                    tableModel.addRow(fila);
+                }//for
                 JOptionPane.showMessageDialog(this, "Consulta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Llamador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
-            }//if-sele
+            }//Else
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
+        }//Catch
 
-    }//consultaPorID
+    }//consultarId
 
     private void mostrarLlamador(LlamadorVoluntario llamador) {
         txtIdLlamador.setText(llamador.getIdLlamador());
         txtNombre.setText(llamador.getNombre());
         txtPrimerApellido.setText(llamador.getPrimerApellido());
-        txtSegundoApellido.setText(llamador.getSegundoApellido());
+        txtSegundoApellido.setText(llamador.getSegundoApellido() != null ? llamador.getSegundoApellido() : "");
         txtTelefono.setText(llamador.getTelefono());
-    }//MostrarLlamador
+    }//mostrarLlamador
 
     private void reestablecer() {
         txtIdLlamador.setText("");
@@ -253,6 +305,7 @@ public class ABCCLlamadorVoluntario extends JInternalFrame {
         txtSegundoApellido.setText("");
         txtTelefono.setText("");
         tableLlamadores.clearSelection();
+        cargarTodosLosLlamadores();
     }//Reestablecer
 
-}//ABBC LlamadoresVoluntarios
+}//ABCC Llamador
