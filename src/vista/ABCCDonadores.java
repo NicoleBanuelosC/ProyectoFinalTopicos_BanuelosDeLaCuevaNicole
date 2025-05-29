@@ -258,37 +258,34 @@ public class ABCCDonadores extends JInternalFrame {
         } else if (esConsulta) {
             rbTodos.setSelected(true);
             habilitarCamposConsulta("Todos");
-            cargarTodosLosDonadores();
+            modeloTabla.setRowCount(0); // Tabla vacía al inicio
         }//if
     }//configurarInterfaz
 
     // Habilita los campos de consulta según la opción seleccionada
     private void habilitarCamposConsulta(String opcion) {
         habilitarTodosLosCampos(false);
+        modeloTabla.setRowCount(0); // Limpia la tabla al cambiar opción
 
         switch (opcion) {
             case "Todos":
-                cargarTodosLosDonadores();
+                // No carga datos, espera a que se ejecute la consulta
                 break;
             case "ID Donador":
                 txtIdDonador.setEnabled(true);
                 txtIdDonador.setEditable(true);
-                modeloTabla.setRowCount(0);
                 break;
             case "Nombre":
                 txtNombre.setEnabled(true);
                 txtNombre.setEditable(true);
-                modeloTabla.setRowCount(0);
                 break;
             case "Primer Apellido":
                 txtPrimerApellido.setEnabled(true);
                 txtPrimerApellido.setEditable(true);
-                modeloTabla.setRowCount(0);
                 break;
             case "Teléfono":
                 txtTelefono.setEnabled(true);
                 txtTelefono.setEditable(true);
-                modeloTabla.setRowCount(0);
                 break;
         }//switch
         reestablecer();
@@ -799,5 +796,4 @@ public class ABCCDonadores extends JInternalFrame {
         txtIdLlamador.setText("");
         tablaDonadores.clearSelection();
     }//reestablecer
-    
 }//ABCCDonadores
