@@ -44,40 +44,17 @@ public class MainScreen extends JFrame {
         desktopPane.add(infoPanel, JLayeredPane.DEFAULT_LAYER);
 
         JMenuBar menuBar = new JMenuBar();
-        JMenu menuEntidades = new JMenu("Entidades");
+        JMenu menuEntidades = new JMenu("E N T I D A D E S");
         menuEntidades.setFont(new Font("SansSerif", Font.BOLD, 16));
 
-        JMenuItem itemDonadores = new JMenuItem("Donadores");
-        itemDonadores.addActionListener(e -> abrirABCC("Donadores"));
-        menuEntidades.add(itemDonadores);
-
-        JMenuItem itemDonativo = new JMenuItem("Donativo");
-        itemDonativo.addActionListener(e -> abrirABCC("Donativo"));
-        menuEntidades.add(itemDonativo);
-
-        JMenuItem itemEvento = new JMenuItem("Evento");
-        itemEvento.addActionListener(e -> abrirABCC("Evento"));
-        menuEntidades.add(itemEvento);
-
-        JMenuItem itemAsistencia = new JMenuItem("Asistencia");
-        itemAsistencia.addActionListener(e -> abrirABCC("Asistencia"));
-        menuEntidades.add(itemAsistencia);
-
-        JMenuItem itemCoordinadorClase = new JMenuItem("CoordinadorClase");
-        itemCoordinadorClase.addActionListener(e -> abrirABCC("CoordinadorClase"));
-        menuEntidades.add(itemCoordinadorClase);
-
-        JMenuItem itemLlamadorVoluntario = new JMenuItem("LlamadorVoluntario");
-        itemLlamadorVoluntario.addActionListener(e -> abrirABCC("LlamadorVoluntario"));
-        menuEntidades.add(itemLlamadorVoluntario);
-
-        JMenuItem itemCirculoDonativo = new JMenuItem("CirculoDonativo");
-        itemCirculoDonativo.addActionListener(e -> abrirABCC("CirculoDonativo"));
-        menuEntidades.add(itemCirculoDonativo);
-
-        JMenuItem itemTienenDonadoresAsistencia = new JMenuItem("Tienen_Donadores_Asistencia");
-        itemTienenDonadoresAsistencia.addActionListener(e -> abrirABCC("Tienen_Donadores_Asistencia"));
-        menuEntidades.add(itemTienenDonadoresAsistencia);
+        addEntityMenu(menuEntidades, "Donadores");
+        addEntityMenu(menuEntidades, "Donativo");
+        addEntityMenu(menuEntidades, "Evento");
+        addEntityMenu(menuEntidades, "Asistencia");
+        addEntityMenu(menuEntidades, "CoordinadorClase");
+        addEntityMenu(menuEntidades, "LlamadorVoluntario");
+        addEntityMenu(menuEntidades, "CirculoDonativo");
+        addEntityMenu(menuEntidades, "Tienen_Donadores_Asistencia");
 
         menuBar.add(menuEntidades);
         setJMenuBar(menuBar);
@@ -105,10 +82,35 @@ public class MainScreen extends JFrame {
             infoPanel.repaint();
         });
 
-    }
+    }//public MainScreen
 
-    private void abrirABCC(String entidad) {
+    private void addEntityMenu(JMenu menuPadre, String nombreEntidad) {
+        JMenu menuEntidad = new JMenu(nombreEntidad);
+        menuEntidad.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+        JMenuItem itemAlta = new JMenuItem("Alta");
+        itemAlta.addActionListener(e -> abrirABCC(nombreEntidad, "Alta"));
+        menuEntidad.add(itemAlta);
+
+        JMenuItem itemBaja = new JMenuItem("Baja");
+        itemBaja.addActionListener(e -> abrirABCC(nombreEntidad, "Baja"));
+        menuEntidad.add(itemBaja);
+
+        JMenuItem itemCambio = new JMenuItem("Cambio");
+        itemCambio.addActionListener(e -> abrirABCC(nombreEntidad, "Cambio"));
+        menuEntidad.add(itemCambio);
+
+        JMenuItem itemConsulta = new JMenuItem("Consulta");
+        itemConsulta.addActionListener(e -> abrirABCC(nombreEntidad, "Consulta"));
+        menuEntidad.add(itemConsulta);
+
+        menuPadre.add(menuEntidad);
+    }//addEntityMenu
+
+    private void abrirABCC(String entidad, String operacion) {
         JInternalFrame abccFrame = null;
+        String title = entidad + " - " + operacion;
+
         switch (entidad) {
             case "Donadores":
                 abccFrame = new ABCCDonadores();
@@ -131,11 +133,15 @@ public class MainScreen extends JFrame {
             case "CirculoDonativo":
                 abccFrame = new ABCCCirculoDonativo();
                 break;
+           // case "Tienen_Donadores_Asistencia":
+               // abccFrame = new ABCCTienenDonadoresAsistencia();
+             //   break;
             default:
                 return;
-        }//awitch
+        }//sqitch
 
         if (abccFrame != null) {
+            abccFrame.setTitle(title);
             desktopPane.add(abccFrame);
             abccFrame.setVisible(true);
             try {
@@ -143,7 +149,6 @@ public class MainScreen extends JFrame {
             } catch (java.beans.PropertyVetoException e) {
                 e.printStackTrace();
             }//catch
-
         }//if
     }//abrirABCC
 
@@ -153,10 +158,9 @@ public class MainScreen extends JFrame {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 e.printStackTrace();
-            }//try
+            }//Catch
             new MainScreen();
         });
-
-    }//void main
+    }//Void main
 
 }//MainScreen
