@@ -4,113 +4,115 @@ import java.sql.*;
 
 public class ConexionBD {
 
-    //atributos de conexión y ejecución de SQL
-    private static ConexionBD instance; //para lo de Singleton
-    private Connection conexion; //para la conexión a la BD
-    private Statement stm; //para ejecutar consultas SQL simples
-    private ResultSet rs; //para almacenar resultados de consultas
+    private static ConexionBD instance; // para lo de Singleton
+    private Connection conexion; // para la conexión a la BD
 
-    //constructor para Singleton
-    private ConexionBD(){
-        try{
-            //carga del driver de MySQL
-            Class.forName("com.mysql.cj.jdbc.Driver");
+    // constructor privado para Singleton
+    private ConexionBD() {
+        conectar(); // se manda llamr separado para manejar la conexión
+    }//ConexionBD
 
-            //URL de conexión a la base de datos
-            String URL = "jdbc:mysql://localhost:3306/SistemaDonaciones";
+    // establecer la conexión con la BD
+    private void conectar() {
+        try {
+            // Carga del driver de MySQL.
+            Class.forName("com.mysql.cj.jdbc.Driver");  //aqui se hizo la correccion
 
-            //establecer conexión (usuario y contraseña de MySQL)
+            // URL de conexión a la base de datos
+            String URL = "jdbc:mysql://127.0.0.1:3306/SistemaDonaciones?useSSL=false&serverTimezone=UTC";
+
+            // establecer conexión (usuario y contraseña de MySQL)
             conexion = DriverManager.getConnection(URL, "root", "tommoway1991");
             System.out.println("Conexión exitosa a Sistema Donaciones");
 
         } catch (ClassNotFoundException e) {
-            System.out.println("Error en el conector/driver");
+
+            System.out.println("Error: No se encontró el conector/driver de MySQL.");
             throw new RuntimeException("Error en el conector: " + e.getMessage());
 
         } catch (SQLException e) {
             System.out.println("Error en la conexión a MySQL");
             throw new RuntimeException("Error en la conexión a MySQL: " + e.getMessage());
-        }//cathc
+        }//catch
 
-    }//constructor
+    }//conectar
 
-    //obtener la instancia unica
-    public static ConexionBD getInstance(){
-        if (instance == null){
+    // obtener la instancia única del Singleton
+    public static synchronized ConexionBD getInstance() {
+        // Se usa synchronized para evitar problemas en multihilo al crear la instancia
+        if (instance == null) {
             instance = new ConexionBD();
         }//if
-
         return instance;
     }//getInstance
 
-    //obtener la conexion, por si se cierra pues
-    public Connection getConnection(){
-        try{
-            if (conexion == null || conexion.isClosed()){
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                String URL = "jdbc:mysql://localhost:3306/SistemaDonaciones";
-                conexion = DriverManager.getConnection(URL, "root", "tommoway1991");
-                System.out.println("Reconexión exitosa");
+    // obtener la conexión, por si se cierra o se pierde
+    public Connection getConnection() {
+        try {
+            // verifica si la conexión es nula o está cerrada, y la reconecta si es necesario
+            if (conexion == null || conexion.isClosed()) {
+                conectar(); // si la conexión se cerró, llamamos a conectar() para restablecerla.
             }//if
-
         } catch (SQLException e) {
             throw new RuntimeException("Error en la reconexión a MySQL: " + e.getMessage());
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver MySQL: " + e.getMessage());
-        }//catch
+        }//Catch
         return conexion;
+    }//getConnection
 
-    }//getConnectoin
-
-    //ejecutar instrucciones de tipo LMD (INSERT, UPDATE, DELETE)
-    public boolean ejecutarInstruccionesLMD(String sql){
-        boolean resultado = false;
-        try{
-            stm = conexion.createStatement();
-            if (stm.executeUpdate(sql) >= 1 ){
-                resultado = true; //retorna true si afecta por lo menos a 1 fila
-            }//if
-
+    // ejecutar instrucciones de tipo LMD (INSERT, UPDATE, DELETE)
+    public boolean ejecutarInstruccionesLMD(String sql) {
+        try (Statement stm = conexion.createStatement()) {
+            return stm.executeUpdate(sql) >= 1; // retorna true si afecta al menos 1 fila
         } catch (SQLException e) {
             throw new RuntimeException("Error en la ejecución de la instrucción SQL: " + e.getMessage());
-        }//Catch
-        return resultado;
-
+        }//catch
     }//ejecutarInstruccionesLMD
 
-    //ejecutar consultas (SELECT)
-    public ResultSet ejecutarInstruccionesSQL(String sql){
-        rs = null;
-        try{
-            stm = conexion.createStatement();
-            rs = stm.executeQuery(sql); //ejecuta la consulta
-
+    // ejecutar consultas (SELECT)
+    public ResultSet ejecutarInstruccionesSQL(String sql) {
+        try {
+            Statement stm = conexion.createStatement();
+            return stm.executeQuery(sql); //ejecuta la consulta y devuelve resultados.
         } catch (SQLException e) {
             throw new RuntimeException("Error en la ejecución de la consulta SQL: " + e.getMessage());
-        }//catch
-        return rs;
+        }//Catcg
     }//ejecutarInstruccionesSQL
 
-    //cerrar recursos
-    public void cerrarRecursos(ResultSet rs, Statement stmt, PreparedStatement pstmt){
-        try{
-            if (rs != null )
-                rs.close();
-            if (stmt != null)
-                stmt.close();
-            if (pstmt != null)
-                pstmt.close();
-
+    // cerrar recursos para evitar fugas de memoria
+    public void cerrarRecursos(ResultSet rs, Statement stmt, PreparedStatement pstmt) {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (pstmt != null) pstmt.close();
         } catch (SQLException e) {
             throw new RuntimeException("Error al cerrar los recursos: " + e.getMessage());
         }//catch
 
     }//cerrarRecursos
 
-    //main para probar la conexión manualmente
-    public static void main(String[] args){
-        ConexionBD.getInstance(); //instancia para probar la conexión
-    }//main
+    public static void main(String[] args) {
+        try {
+            // cargar el driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
-}//COnexionBD
+            // conectar con la BD
+            Connection conn = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/SistemaDonaciones?useSSL=false&serverTimezone=UTC",
+                    "root",
+                    "tommoway1991"
+            );
+
+            System.out.println("¡Conexión establecida correctamente!");
+            conn.close(); // Cerrar la conexión de prueba
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Error: No se encontró el driver de MySQL.");
+
+        } catch (SQLException e) {
+            System.out.println("Error en la conexión: " + e.getMessage());
+
+        }//catch
+
+    }//void main
+
+}//ConexionBD

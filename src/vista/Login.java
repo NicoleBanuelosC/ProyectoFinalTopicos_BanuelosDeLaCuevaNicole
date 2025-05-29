@@ -53,13 +53,14 @@ public class Login extends JFrame {
             ImageIcon mu = new ImageIcon(getClass().getResource("/imagenes/mu.png"));
             if (mu.getImage() == null) {
                 throw new Exception("la imagen no se pudo cargar");
-            }
+            }//if
             Image scaledImage = mu.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(scaledImage));
         } catch (Exception e) {
             System.err.println("error al cargar la imagen: " + e.getMessage());
             lblImage.setText("no se pudo cargar la imagen");
-        }
+        }//Catch
+
         lblImage.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(lblImage);
 
@@ -151,7 +152,7 @@ public class Login extends JFrame {
         String password = new String(txtPassword.getPassword());
 
         try {
-            Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/SistemaDonaciones", "root", "tommoway1991");
+            Connection conexion = conexionBD.ConexionBD.getInstance().getConnection(); // Usar Singleton
             String sentencia = "SELECT * FROM Usuarios WHERE usuario = ? AND password = ?";
             PreparedStatement stmt = conexion.prepareStatement(sentencia);
             stmt.setString(1, usuario);
@@ -160,15 +161,15 @@ public class Login extends JFrame {
 
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "¡Bienvenidx a Colecta de Universidad!");
-                new MainScreen().setVisible(true); //para que pase a la principal al iniciar login (supongamos que se llama MainScreen)
+                new MainScreen().setVisible(true);
                 dispose();
+                
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
-            }//if-else
+            }//if else
 
             rs.close();
             stmt.close();
-            conexion.close();
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al conectar a la BD: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
