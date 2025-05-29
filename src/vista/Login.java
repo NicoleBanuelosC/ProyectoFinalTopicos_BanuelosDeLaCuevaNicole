@@ -147,6 +147,9 @@ public class Login extends JFrame {
 
     }//Login
 
+    //User: nicol
+    //Contraseña: 29091998
+
     private void validarLogin() {
         String usuario = txtUsuario.getText();
         String password = new String(txtPassword.getPassword());
@@ -163,7 +166,7 @@ public class Login extends JFrame {
                 JOptionPane.showMessageDialog(this, "¡Bienvenidx a Colecta de Universidad!");
                 new MainScreen().setVisible(true);
                 dispose();
-                
+
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
             }//if else
