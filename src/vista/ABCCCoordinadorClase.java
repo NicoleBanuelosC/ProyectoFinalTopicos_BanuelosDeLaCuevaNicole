@@ -248,5 +248,5 @@ public class ABCCCoordinadorClase extends JInternalFrame {
         txtIdCirculo.setText("");
         tableCoordinadores.clearSelection();
     }//reestablecer
-    
+
 }//ABCC Coordinador

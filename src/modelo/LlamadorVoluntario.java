@@ -13,7 +13,7 @@ public class LlamadorVoluntario {
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.telefono = telefono;
-    }//public LlamadorVoluntario
+    }//public
 
     public String getIdLlamador() { return idLlamador; }
     public void setIdLlamador(String idLlamador) { this.idLlamador = idLlamador; }
@@ -29,4 +29,5 @@ public class LlamadorVoluntario {
 
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+
 }//LlamadorVoluntario
