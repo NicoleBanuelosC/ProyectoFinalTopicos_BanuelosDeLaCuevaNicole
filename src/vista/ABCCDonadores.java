@@ -10,10 +10,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ABCCDonadores extends JInternalFrame {
-    private JTextField txtIdDonador, txtNombre, txtPrimerApellido, txtSegundoApellido, txtTelefono, txtNumeroVivienda, txtCalle, txtColonia, txtMunicipioCiudad, txtCodigoPostal, txtEstado, txtPais, txtCategoria, txtAñoGraduacion, txtNombreConyuge, txtIdCirculo, txtIdCoordinador, txtIdLlamador;
+    private JTextField txtIdDonador, txtNombre, txtPrimerApellido, txtSegundoApellido, txtTelefono,
+            txtNumeroVivienda, txtCalle, txtColonia, txtMunicipioCiudad, txtCodigoPostal,
+            txtEstado, txtPais, txtCategoria, txtAñoGraduacion, txtNombreConyuge,
+            txtIdCirculo, txtIdCoordinador, txtIdLlamador;
     private JButton btnAlta, btnBaja, btnCambio, btnConsulta, btnReestablecer, btnCargarSeleccion;
-    private JTable tableDonadores;
-    private DefaultTableModel tableModel;
+    private JTable tablaDonadores;
+    private DefaultTableModel modeloTabla;
     private final DonadorDAO donadorDAO;
 
     public ABCCDonadores() {
@@ -27,80 +30,120 @@ public class ABCCDonadores extends JInternalFrame {
 
         setLayout(new BorderLayout());
 
-        JPanel panelCampos = new JPanel(new GridLayout(10, 2, 5, 5));
+        JPanel panelCampos = new JPanel(new GridBagLayout());
         panelCampos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        panelCampos.add(new JLabel("ID Donador:"));
-        txtIdDonador = new JTextField();
-        panelCampos.add(txtIdDonador);
+        // Fila 1
+        gbc.gridx = 0; gbc.gridy = 0;
+        panelCampos.add(new JLabel("ID Donador:"), gbc);
+        gbc.gridx = 1;
+        txtIdDonador = new JTextField(10);
+        panelCampos.add(txtIdDonador, gbc);
 
-        panelCampos.add(new JLabel("Nombre:"));
-        txtNombre = new JTextField();
-        panelCampos.add(txtNombre);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Nombre:"), gbc);
+        gbc.gridx = 3;
+        txtNombre = new JTextField(15);
+        panelCampos.add(txtNombre, gbc);
 
-        panelCampos.add(new JLabel("Primer Apellido:"));
-        txtPrimerApellido = new JTextField();
-        panelCampos.add(txtPrimerApellido);
+        gbc.gridx = 0; gbc.gridy = 1;
+        panelCampos.add(new JLabel("Primer Apellido:"), gbc);
+        gbc.gridx = 1;
+        txtPrimerApellido = new JTextField(15);
+        panelCampos.add(txtPrimerApellido, gbc);
 
-        panelCampos.add(new JLabel("Segundo Apellido:"));
-        txtSegundoApellido = new JTextField();
-        panelCampos.add(txtSegundoApellido);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Segundo Apellido:"), gbc);
+        gbc.gridx = 3;
+        txtSegundoApellido = new JTextField(15);
+        panelCampos.add(txtSegundoApellido, gbc);
 
-        panelCampos.add(new JLabel("Teléfono:"));
-        txtTelefono = new JTextField();
-        panelCampos.add(txtTelefono);
+        gbc.gridx = 0; gbc.gridy = 2;
+        panelCampos.add(new JLabel("Teléfono:"), gbc);
+        gbc.gridx = 1;
+        txtTelefono = new JTextField(10);
+        panelCampos.add(txtTelefono, gbc);
 
-        panelCampos.add(new JLabel("Número Vivienda:"));
-        txtNumeroVivienda = new JTextField();
-        panelCampos.add(txtNumeroVivienda);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Número Vivienda:"), gbc);
+        gbc.gridx = 3;
+        txtNumeroVivienda = new JTextField(5);
+        panelCampos.add(txtNumeroVivienda, gbc);
 
-        panelCampos.add(new JLabel("Calle:"));
-        txtCalle = new JTextField();
-        panelCampos.add(txtCalle);
+        gbc.gridx = 0; gbc.gridy = 3;
+        panelCampos.add(new JLabel("Calle:"), gbc);
+        gbc.gridx = 1;
+        txtCalle = new JTextField(15);
+        panelCampos.add(txtCalle, gbc);
 
-        panelCampos.add(new JLabel("Colonia:"));
-        txtColonia = new JTextField();
-        panelCampos.add(txtColonia);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Colonia:"), gbc);
+        gbc.gridx = 3;
+        txtColonia = new JTextField(15);
+        panelCampos.add(txtColonia, gbc);
 
-        panelCampos.add(new JLabel("Municipio/Ciudad:"));
-        txtMunicipioCiudad = new JTextField();
-        panelCampos.add(txtMunicipioCiudad);
+        gbc.gridx = 0; gbc.gridy = 4;
+        panelCampos.add(new JLabel("Municipio/Ciudad:"), gbc);
+        gbc.gridx = 1;
+        txtMunicipioCiudad = new JTextField(15);
+        panelCampos.add(txtMunicipioCiudad, gbc);
 
-        panelCampos.add(new JLabel("Código Postal:"));
-        txtCodigoPostal = new JTextField();
-        panelCampos.add(txtCodigoPostal);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Código Postal:"), gbc);
+        gbc.gridx = 3;
+        txtCodigoPostal = new JTextField(6);
+        panelCampos.add(txtCodigoPostal, gbc);
 
-        panelCampos.add(new JLabel("Estado:"));
-        txtEstado = new JTextField();
-        panelCampos.add(txtEstado);
+        gbc.gridx = 0; gbc.gridy = 5;
+        panelCampos.add(new JLabel("Estado:"), gbc);
+        gbc.gridx = 1;
+        txtEstado = new JTextField(15);
+        panelCampos.add(txtEstado, gbc);
 
-        panelCampos.add(new JLabel("País:"));
-        txtPais = new JTextField();
-        panelCampos.add(txtPais);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("País:"), gbc);
+        gbc.gridx = 3;
+        txtPais = new JTextField(15);
+        panelCampos.add(txtPais, gbc);
 
-        panelCampos.add(new JLabel("Categoría:"));
-        txtCategoria = new JTextField();
-        panelCampos.add(txtCategoria);
+        gbc.gridx = 0; gbc.gridy = 6;
+        panelCampos.add(new JLabel("Categoría:"), gbc);
+        gbc.gridx = 1;
+        txtCategoria = new JTextField(15);
+        panelCampos.add(txtCategoria, gbc);
 
-        panelCampos.add(new JLabel("Año Graduación:"));
-        txtAñoGraduacion = new JTextField();
-        panelCampos.add(txtAñoGraduacion);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("Año Graduación:"), gbc);
+        gbc.gridx = 3;
+        txtAñoGraduacion = new JTextField(4);
+        panelCampos.add(txtAñoGraduacion, gbc);
 
-        panelCampos.add(new JLabel("Nombre Cónyuge:"));
-        txtNombreConyuge = new JTextField();
-        panelCampos.add(txtNombreConyuge);
+        gbc.gridx = 0; gbc.gridy = 7;
+        panelCampos.add(new JLabel("Nombre Cónyuge:"), gbc);
+        gbc.gridx = 1;
+        txtNombreConyuge = new JTextField(15);
+        panelCampos.add(txtNombreConyuge, gbc);
 
-        panelCampos.add(new JLabel("ID Círculo:"));
-        txtIdCirculo = new JTextField();
-        panelCampos.add(txtIdCirculo);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("ID Círculo:"), gbc);
+        gbc.gridx = 3;
+        txtIdCirculo = new JTextField(10);
+        panelCampos.add(txtIdCirculo, gbc);
 
-        panelCampos.add(new JLabel("ID Coordinador:"));
-        txtIdCoordinador = new JTextField();
-        panelCampos.add(txtIdCoordinador);
+        gbc.gridx = 0; gbc.gridy = 8;
+        panelCampos.add(new JLabel("ID Coordinador:"), gbc);
+        gbc.gridx = 1;
+        txtIdCoordinador = new JTextField(10);
+        panelCampos.add(txtIdCoordinador, gbc);
 
-        panelCampos.add(new JLabel("ID Llamador:"));
-        txtIdLlamador = new JTextField();
-        panelCampos.add(txtIdLlamador);
+        gbc.gridx = 2;
+        panelCampos.add(new JLabel("ID Llamador:"), gbc);
+        gbc.gridx = 3;
+        txtIdLlamador = new JTextField(10);
+        panelCampos.add(txtIdLlamador, gbc);
 
         JPanel panelBotones = new JPanel(new FlowLayout());
         btnAlta = new JButton("Alta");
@@ -132,20 +175,20 @@ public class ABCCDonadores extends JInternalFrame {
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
         String[] columnas = {"ID Donador", "Nombre", "Primer Apellido", "Teléfono", "ID Círculo", "ID Coordinador", "ID Llamador"};
-        tableModel = new DefaultTableModel(columnas, 0);
-        tableDonadores = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(tableDonadores);
+        modeloTabla = new DefaultTableModel(columnas, 0);
+        tablaDonadores = new JTable(modeloTabla);
+        JScrollPane scrollPane = new JScrollPane(tablaDonadores);
 
         cargarTodosLosDonadores();
 
         add(panelSuperior, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-    }//public ABCC
+    }//public
 
     private void cargarTodosLosDonadores() {
         try {
             List<Donador> donadores = donadorDAO.consultaTodos();
-            tableModel.setRowCount(0);
+            modeloTabla.setRowCount(0);
             for (Donador donador : donadores) {
                 Object[] fila = {
                         donador.getIdDonador(),
@@ -156,72 +199,91 @@ public class ABCCDonadores extends JInternalFrame {
                         donador.getIdCoordinador(),
                         donador.getIdLlamador()
                 };
-                tableModel.addRow(fila);
+                modeloTabla.addRow(fila);
             }//for
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar donadores: " + ex.getMessage());
-        }//catch
+            JOptionPane.showMessageDialog(this, "Error al cargar donadores: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//Catch
 
     }//CargarTodosLosDonadores
 
     private void cargarSeleccion() {
-        int filaSeleccionada = tableDonadores.getSelectedRow();
-
+        int filaSeleccionada = tablaDonadores.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Por favor, seleccione un donador de la tabla");
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un donador de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
-        }//if
+        }//fi
 
-        String idDonador = (String) tableModel.getValueAt(filaSeleccionada, 0);
+        String idDonador = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
         try {
             Donador donador = donadorDAO.consulta(idDonador);
-            mostrarDonador(donador);
+            if (donador != null) {
+                mostrarDonador(donador);
+            } else {
+                JOptionPane.showMessageDialog(this, "Donador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+            }//Else
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar el donador: " + ex.getMessage());
-        }//catch
+            JOptionPane.showMessageDialog(this, "Error al cargar el donador: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//Catcg
 
-    }//CargarSeleccion
+    }//cargarSeleccion
 
     private boolean validarCamposObligatorios() {
         if (txtIdDonador.getText().trim().isEmpty() ||
                 txtNombre.getText().trim().isEmpty() ||
                 txtPrimerApellido.getText().trim().isEmpty() ||
                 txtTelefono.getText().trim().isEmpty() ||
-                txtIdCirculo.getText().trim().isEmpty() ||
-                txtIdCoordinador.getText().trim().isEmpty() ||
-                txtIdLlamador.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Los campos ID Donador, Nombre, Primer Apellido, Teléfono, ID Círculo, ID Coordinador e ID Llamador son obligatorios");
+                txtNumeroVivienda.getText().trim().isEmpty() ||
+                txtCalle.getText().trim().isEmpty() ||
+                txtColonia.getText().trim().isEmpty() ||
+                txtCodigoPostal.getText().trim().isEmpty() ||
+                txtPais.getText().trim().isEmpty() ||
+                txtCategoria.getText().trim().isEmpty() ||
+                txtAñoGraduacion.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Los campos ID Donador, Nombre, Primer Apellido, Teléfono, Número Vivienda, Calle, Colonia, Código Postal, País, Categoría y Año de Graduación son obligatorios", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }//validarCampos
+
+        if (txtIdDonador.getText().trim().length() > 10) {
+            JOptionPane.showMessageDialog(this, "ID Donador debe tener máximo 10 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return false;
         }//if
+
+        if (txtNumeroVivienda.getText().trim().length() > 5) {
+            JOptionPane.showMessageDialog(this, "Número Vivienda debe tener máximo 5 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }//fi
+
+        if (txtCodigoPostal.getText().trim().length() > 6) {
+            JOptionPane.showMessageDialog(this, "Código Postal debe tener máximo 6 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }//fi
+
         return true;
-    }//validarCampos
+    }//ValidarCampos
 
-    private Integer parseAñoGraduacion() {
+    private int parseAñoGraduacion() {
         String añoText = txtAñoGraduacion.getText().trim();
-        if (añoText.isEmpty()) {
-            return null;
-        }//if
-
         try {
             int año = Integer.parseInt(añoText);
-            if (año < 1900 || año > 2025) {
-                throw new NumberFormatException("El año de graduación debe estar entre 1900 y 2025");
+            if (año < 1901 || año > 2155) {
+                throw new NumberFormatException("El año de graduación debe estar entre 1901 y 2155");
             }//if
             return año;
-
         } catch (NumberFormatException ex) {
             throw new NumberFormatException("El año de graduación debe ser un número válido: " + ex.getMessage());
-        }//catch
-
-    }//parseañograd
+        }//Catcg
+    }//parseAñoGrad
 
     private void alta() {
         try {
-            if (!validarCamposObligatorios()) return;
-            Integer añoGrad = parseAñoGraduacion();
-            int añoGraduacionValue = (añoGrad != null) ? añoGrad : 0;
+            if (!validarCamposObligatorios())
+                return;
+            int añoGraduacion = parseAñoGraduacion();
 
             Donador donador = new Donador(
                     txtIdDonador.getText().trim(),
@@ -237,47 +299,60 @@ public class ABCCDonadores extends JInternalFrame {
                     txtEstado.getText().trim(),
                     txtPais.getText().trim(),
                     txtCategoria.getText().trim(),
-                    añoGraduacionValue,
+                    añoGraduacion,
                     txtNombreConyuge.getText().trim(),
-                    txtIdCirculo.getText().trim(),
-                    txtIdCoordinador.getText().trim(),
-                    txtIdLlamador.getText().trim()
+                    txtIdCirculo.getText().trim().isEmpty() ? null : txtIdCirculo.getText().trim(),
+                    txtIdCoordinador.getText().trim().isEmpty() ? null : txtIdCoordinador.getText().trim(),
+                    txtIdLlamador.getText().trim().isEmpty() ? null : txtIdLlamador.getText().trim()
             );
             donadorDAO.alta(donador);
-            JOptionPane.showMessageDialog(this, "Alta exitosa");
+            JOptionPane.showMessageDialog(this, "Alta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosDonadores();
             reestablecer();
-
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al dar de alta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
-        }//cacthc
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }//Catch
 
     }//alta
 
     private void baja() {
-        try {
+        String idDonador = null;
+        int filaSeleccionada = tablaDonadores.getSelectedRow();
+        if (filaSeleccionada != -1) {
+            idDonador = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
+        } else {
             if (txtIdDonador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingresa el ID del donador o selecciona uno de la tabla");
+                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del donador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
-            donadorDAO.baja(txtIdDonador.getText().trim());
-            JOptionPane.showMessageDialog(this, "Baja exitosa");
+            idDonador = txtIdDonador.getText().trim();
+        }//Else
+
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el donador con ID " + idDonador + "?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }//if
+
+        try {
+            donadorDAO.baja(idDonador);
+            JOptionPane.showMessageDialog(this, "Baja exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosDonadores();
             reestablecer();
-
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-        }//catch
+            JOptionPane.showMessageDialog(this, "Error al dar de baja: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//Catcg
+
     }//baja
 
     private void cambio() {
         try {
             if (!validarCamposObligatorios()) return;
-            Integer añoGrad = parseAñoGraduacion();
-            int añoGraduacionValue = (añoGrad != null) ? añoGrad : 0;
+            int añoGraduacion = parseAñoGraduacion();
 
             Donador donador = new Donador(
                     txtIdDonador.getText().trim(),
@@ -293,61 +368,69 @@ public class ABCCDonadores extends JInternalFrame {
                     txtEstado.getText().trim(),
                     txtPais.getText().trim(),
                     txtCategoria.getText().trim(),
-                    añoGraduacionValue,
+                    añoGraduacion,
                     txtNombreConyuge.getText().trim(),
-                    txtIdCirculo.getText().trim(),
-                    txtIdCoordinador.getText().trim(),
-                    txtIdLlamador.getText().trim()
+                    txtIdCirculo.getText().trim().isEmpty() ? null : txtIdCirculo.getText().trim(),
+                    txtIdCoordinador.getText().trim().isEmpty() ? null : txtIdCoordinador.getText().trim(),
+                    txtIdLlamador.getText().trim().isEmpty() ? null : txtIdLlamador.getText().trim()
             );
             donadorDAO.cambio(donador);
-            JOptionPane.showMessageDialog(this, "Cambio exitoso");
+            JOptionPane.showMessageDialog(this, "Cambio exitoso", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosDonadores();
             reestablecer();
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
-        }//catch
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }//Catch
+
     }//cambio
 
     private void consultaPorId() {
         try {
             if (txtIdDonador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingresa el ID del donador");
+                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del donador", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
+
             Donador donador = donadorDAO.consulta(txtIdDonador.getText().trim());
-            mostrarDonador(donador);
-            JOptionPane.showMessageDialog(this, "Consulta exitosa");
+            if (donador != null) {
+                mostrarDonador(donador);
+                JOptionPane.showMessageDialog(this, "Consulta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Donador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+            }//Else
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-        }//try-catch
+            JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }//Catch
 
-    }//ConsultarPorId
+    }//ConsultarPorID
 
     private void mostrarDonador(Donador donador) {
         txtIdDonador.setText(donador.getIdDonador());
         txtNombre.setText(donador.getNombre());
         txtPrimerApellido.setText(donador.getPrimerApellido());
-        txtSegundoApellido.setText(donador.getSegundoApellido());
+        txtSegundoApellido.setText(donador.getSegundoApellido() != null ? donador.getSegundoApellido() : "");
         txtTelefono.setText(donador.getTelefono());
         txtNumeroVivienda.setText(donador.getNumeroVivienda());
         txtCalle.setText(donador.getCalle());
         txtColonia.setText(donador.getColonia());
-        txtMunicipioCiudad.setText(donador.getMunicipioCiudad());
+        txtMunicipioCiudad.setText(donador.getMunicipioCiudad() != null ? donador.getMunicipioCiudad() : "");
         txtCodigoPostal.setText(donador.getCodigoPostal());
-        txtEstado.setText(donador.getEstado());
+        txtEstado.setText(donador.getEstado() != null ? donador.getEstado() : "");
         txtPais.setText(donador.getPais());
         txtCategoria.setText(donador.getCategoria());
-        txtAñoGraduacion.setText(donador.getAñoGraduacion() == 0 ? "" : String.valueOf(donador.getAñoGraduacion()));
-        txtNombreConyuge.setText(donador.getNombreConyuge());
-        txtIdCirculo.setText(donador.getIdCirculo());
-        txtIdCoordinador.setText(donador.getIdCoordinador());
-        txtIdLlamador.setText(donador.getIdLlamador());
-    }//MostrarDonadores
+        txtAñoGraduacion.setText(String.valueOf(donador.getAñoGraduacion()));
+        txtNombreConyuge.setText(donador.getNombreConyuge() != null ? donador.getNombreConyuge() : "");
+        txtIdCirculo.setText(donador.getIdCirculo() != null ? donador.getIdCirculo() : "");
+        txtIdCoordinador.setText(donador.getIdCoordinador() != null ? donador.getIdCoordinador() : "");
+        txtIdLlamador.setText(donador.getIdLlamador() != null ? donador.getIdLlamador() : "");
+    }//mostrarDonador
 
     private void reestablecer() {
         txtIdDonador.setText("");
@@ -368,7 +451,7 @@ public class ABCCDonadores extends JInternalFrame {
         txtIdCirculo.setText("");
         txtIdCoordinador.setText("");
         txtIdLlamador.setText("");
-        tableDonadores.clearSelection();
-    }//restablecer
+        tablaDonadores.clearSelection();
+    }//Reestablevcer
 
-}//ABCCDonadores
+}//ABCC Donadores

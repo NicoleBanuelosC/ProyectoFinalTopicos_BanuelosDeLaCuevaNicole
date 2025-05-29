@@ -93,9 +93,9 @@ public class MainScreen extends JFrame {
                 abccFrame = new ABCCCirculoDonativo();
                 break;
 
-            case "Tienen_Donadores_Asistencia":
-                abccFrame = new ABCCTienenDonadoresAsistencia();
-                break;
+          //  case "Tienen_Donadores_Asistencia":
+            //    abccFrame = new ABCCTienenDonadoresAsistencia();
+              //  break;
 
             default:
                 return;

@@ -14,17 +14,17 @@ public class Donador {
     private String estado;
     private String pais;
     private String categoria;
-    private String añoGraduacion;
+    private int añoGraduacion;
     private String nombreConyuge;
     private String idCirculo;
     private String idCoordinador;
     private String idLlamador;
 
-    public Donador (String idDonador, String nombre, String primerApellido, String segundoApellido, String telefono,
-                    String numeroVivienda, String calle, String colonia, String municipioCiudad, String codigoPostal,
-                    String estado, String pais, String categoria, int añoGraduacion, String nombreConyuge,
-                    String idCirculo, String idCoordinador, String idLlamador){
-
+    public Donador(String idDonador, String nombre, String primerApellido, String segundoApellido,
+                   String telefono, String numeroVivienda, String calle, String colonia,
+                   String municipioCiudad, String codigoPostal, String estado, String pais,
+                   String categoria, int añoGraduacion, String nombreConyuge,
+                   String idCirculo, String idCoordinador, String idLlamador) {
         this.idDonador = idDonador;
         this.nombre = nombre;
         this.primerApellido = primerApellido;
@@ -38,7 +38,7 @@ public class Donador {
         this.estado = estado;
         this.pais = pais;
         this.categoria = categoria;
-        this.añoGraduacion = String.valueOf(añoGraduacion);
+        this.añoGraduacion = añoGraduacion;
         this.nombreConyuge = nombreConyuge;
         this.idCirculo = idCirculo;
         this.idCoordinador = idCoordinador;
@@ -84,8 +84,8 @@ public class Donador {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 
-    public String getAñoGraduacion() { return añoGraduacion; }
-    public void setAñoGraduacion(String añoGraduacion) { this.añoGraduacion = añoGraduacion; }
+    public int getAñoGraduacion() { return añoGraduacion; }
+    public void setAñoGraduacion(int añoGraduacion) { this.añoGraduacion = añoGraduacion; }
 
     public String getNombreConyuge() { return nombreConyuge; }
     public void setNombreConyuge(String nombreConyuge) { this.nombreConyuge = nombreConyuge; }
