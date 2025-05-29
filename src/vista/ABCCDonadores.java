@@ -8,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.ArrayList;
 
 public class ABCCDonadores extends JInternalFrame {
     private JTextField txtIdDonador, txtNombre, txtPrimerApellido, txtSegundoApellido, txtTelefono,
@@ -218,8 +217,7 @@ public class ABCCDonadores extends JInternalFrame {
 
         add(panelControlesSuperiores, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-
-    }//public ABCCDonadores
+    }//public ABCC
 
     private void configurarInterfazPorOperacion(String operacion) {
         boolean esAlta = operacion.equalsIgnoreCase("Alta");
@@ -227,98 +225,75 @@ public class ABCCDonadores extends JInternalFrame {
         boolean esCambio = operacion.equalsIgnoreCase("Cambio");
         boolean esConsulta = operacion.equalsIgnoreCase("Consulta");
 
-        btnAlta.setVisible(false);
-        btnBaja.setVisible(false);
-        btnCambio.setVisible(false);
-        btnEjecutarConsulta.setVisible(false);
-        btnCargarSeleccion.setVisible(false);
+        btnAlta.setVisible(esAlta);
+        btnBaja.setVisible(esBaja);
+        btnCambio.setVisible(esCambio);
+        btnEjecutarConsulta.setVisible(esConsulta);
+        btnCargarSeleccion.setVisible(esBaja || esCambio || esConsulta);
         btnReestablecer.setVisible(true);
-
-        panelOpcionesConsulta.setVisible(false);
+        panelOpcionesConsulta.setVisible(esConsulta);
 
         habilitarTodosLosCampos(false);
-        txtIdDonador.setEditable(false);
 
         if (esAlta) {
-            btnAlta.setVisible(true);
             habilitarTodosLosCampos(true);
             txtIdDonador.setEditable(true);
             reestablecer();
             modeloTabla.setRowCount(0);
+            cargarTodosLosDonadores();
 
         } else if (esBaja) {
-            btnBaja.setVisible(true);
             txtIdDonador.setEnabled(true);
             txtIdDonador.setEditable(true);
-            btnCargarSeleccion.setVisible(true);
+            reestablecer();
             modeloTabla.setRowCount(0);
+            cargarTodosLosDonadores();
 
         } else if (esCambio) {
-            btnCambio.setVisible(true);
             habilitarTodosLosCampos(true);
-            txtIdDonador.setEditable(false);
-            btnCargarSeleccion.setVisible(true);
+            txtIdDonador.setEditable(true);
+            reestablecer();
             modeloTabla.setRowCount(0);
+            cargarTodosLosDonadores();
 
         } else if (esConsulta) {
-            panelOpcionesConsulta.setVisible(true);
-            btnEjecutarConsulta.setVisible(true);
-            btnCargarSeleccion.setVisible(true);
             rbTodos.setSelected(true);
             habilitarCamposConsulta("Todos");
+            cargarTodosLosDonadores();
         }//Else if
 
-    }//configurarInterfazPorOperacion
+    }//configurarINterfaz
 
     private void habilitarCamposConsulta(String opcion) {
-        txtIdDonador.setEnabled(false);
-        txtNombre.setEnabled(false);
-        txtPrimerApellido.setEnabled(false);
-        txtSegundoApellido.setEnabled(false);
-        txtTelefono.setEnabled(false);
-        txtNumeroVivienda.setEnabled(false);
-        txtCalle.setEnabled(false);
-        txtColonia.setEnabled(false);
-        txtMunicipioCiudad.setEnabled(false);
-        txtCodigoPostal.setEnabled(false);
-        txtEstado.setEnabled(false);
-        txtPais.setEnabled(false);
-        txtCategoria.setEnabled(false);
-        txtAñoGraduacion.setEnabled(false);
-        txtNombreConyuge.setEnabled(false);
-        txtIdCirculo.setEnabled(false);
-        txtIdCoordinador.setEnabled(false);
-        txtIdLlamador.setEnabled(false);
+        habilitarTodosLosCampos(false);
 
         switch (opcion) {
             case "Todos":
                 cargarTodosLosDonadores();
                 break;
-
             case "ID Donador":
                 txtIdDonador.setEnabled(true);
                 txtIdDonador.setEditable(true);
                 modeloTabla.setRowCount(0);
                 break;
-
             case "Nombre":
                 txtNombre.setEnabled(true);
+                txtNombre.setEditable(true);
                 modeloTabla.setRowCount(0);
                 break;
-
             case "Primer Apellido":
                 txtPrimerApellido.setEnabled(true);
+                txtPrimerApellido.setEditable(true);
                 modeloTabla.setRowCount(0);
                 break;
-
             case "Teléfono":
                 txtTelefono.setEnabled(true);
+                txtTelefono.setEditable(true);
                 modeloTabla.setRowCount(0);
                 break;
         }//switch
         reestablecer();
-
-    }//habilitarCamposConsultya
+    }//habilitarCamposConsultas
 
     private void habilitarTodosLosCampos(boolean habilitar) {
         txtIdDonador.setEnabled(habilitar);
@@ -339,7 +314,7 @@ public class ABCCDonadores extends JInternalFrame {
         txtIdCirculo.setEnabled(habilitar);
         txtIdCoordinador.setEnabled(habilitar);
         txtIdLlamador.setEnabled(habilitar);
-    }//habilitarTodosLosCampos
+    }//habilarTodosLosCampos
 
     private void ejecutarConsulta() {
         if (rbTodos.isSelected()) {
@@ -359,11 +334,9 @@ public class ABCCDonadores extends JInternalFrame {
 
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, seleccione una opción de consulta.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        }//if-else
+        }//else
+    }//ejecutarConsulta
 
-    }//ejecutarConsultar
-
-    // consultar por nombre
     private void consultaPorNombre() {
         try {
             String nombre = txtNombre.getText().trim();
@@ -372,9 +345,8 @@ public class ABCCDonadores extends JInternalFrame {
                 return;
             }//if
 
-            List<Donador> donadores = donadorDAO.consultaPorNombre(nombre); // Asume que este método existe en tu DAO
+            List<Donador> donadores = donadorDAO.consultaPorNombre(nombre);
             actualizarTabla(donadores);
-
             if (donadores.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No se encontraron donadores con ese nombre.", "Información", JOptionPane.INFORMATION_MESSAGE);
             }//if
@@ -386,7 +358,6 @@ public class ABCCDonadores extends JInternalFrame {
 
     }//consultaPorNombre
 
-    // consultar por primer apellido
     private void consultaPorPrimerApellido() {
         try {
             String primerApellido = txtPrimerApellido.getText().trim();
@@ -397,7 +368,6 @@ public class ABCCDonadores extends JInternalFrame {
 
             List<Donador> donadores = donadorDAO.consultaPorPrimerApellido(primerApellido);
             actualizarTabla(donadores);
-
             if (donadores.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No se encontraron donadores con ese primer apellido.", "Información", JOptionPane.INFORMATION_MESSAGE);
             }//if
@@ -407,48 +377,45 @@ public class ABCCDonadores extends JInternalFrame {
             ex.printStackTrace();
         }//Cacth
 
-    }//consultaPorPrimerAp
+    }//primerap
 
-    //consultar por teléfono
     private void consultaPorTelefono() {
         try {
             String telefono = txtTelefono.getText().trim();
             if (telefono.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor, ingrese el teléfono a buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
-            }//if
-
+            }
+            if (!telefono.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "El teléfono debe contener solo números.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             List<Donador> donadores = donadorDAO.consultaPorTelefono(telefono);
             actualizarTabla(donadores);
-
             if (donadores.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No se encontraron donadores con ese teléfono.", "Información", JOptionPane.INFORMATION_MESSAGE);
-            }//if
-
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al consultar por teléfono: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
-
+        }//Catch
     }//consultaPorTelefono
 
-    //  actualizar la tabla con una lista de donadores
     private void actualizarTabla(List<Donador> donadores) {
-        modeloTabla.setRowCount(0); //limpiar la tabla
+        modeloTabla.setRowCount(0);
         for (Donador donador : donadores) {
             Object[] fila = {
                     donador.getIdDonador(),
                     donador.getNombre(),
                     donador.getPrimerApellido(),
                     donador.getTelefono(),
-                    donador.getIdCirculo(),
-                    donador.getIdCoordinador(),
-                    donador.getIdLlamador()
+                    donador.getIdCirculo() != null ? donador.getIdCirculo() : "",
+                    donador.getIdCoordinador() != null ? donador.getIdCoordinador() : "",
+                    donador.getIdLlamador() != null ? donador.getIdLlamador() : ""
             };
             modeloTabla.addRow(fila);
         }//for
-
-    }//ActualizarTabla
+    }//actualizarTabla
 
     private void cargarTodosLosDonadores() {
         try {
@@ -457,9 +424,8 @@ public class ABCCDonadores extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al cargar donadores: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//try-cactch
-
-    }//CargarTodosLosDonadores
+        }//catch
+    }//CargarTodos
 
     private void cargarSeleccion() {
         int filaSeleccionada = tablaDonadores.getSelectedRow();
@@ -476,47 +442,92 @@ public class ABCCDonadores extends JInternalFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "Donador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
             }//else
-
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al cargar el donador: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }//Catch
 
-    }//cargarSeleccione
+    }//CargarSleecion
 
     private boolean validarCamposObligatorios() {
-        if (txtIdDonador.getText().trim().isEmpty() ||
-                txtNombre.getText().trim().isEmpty() ||
-                txtPrimerApellido.getText().trim().isEmpty() ||
-                txtTelefono.getText().trim().isEmpty() ||
-                txtNumeroVivienda.getText().trim().isEmpty() ||
-                txtCalle.getText().trim().isEmpty() ||
-                txtColonia.getText().trim().isEmpty() ||
-                txtCodigoPostal.getText().trim().isEmpty() ||
-                txtPais.getText().trim().isEmpty() ||
-                txtCategoria.getText().trim().isEmpty() ||
-                txtAñoGraduacion.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Los campos ID Donador, Nombre, Primer Apellido, Teléfono, Número Vivienda, Calle, Colonia, Código Postal, País, Categoría y Año de Graduación son obligatorios", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        StringBuilder mensaje = new StringBuilder();
+        boolean valido = true;
+
+        if (txtIdDonador.getText().trim().isEmpty()) {
+            mensaje.append("ID Donador es obligatorio\n");
+            valido = false;
+        } else if (txtIdDonador.getText().trim().length() > 10) {
+            mensaje.append("ID Donador debe tener máximo 10 caracteres\n");
+            valido = false;
+        }//else if
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mensaje.append("Nombre es obligatorio\n");
+            valido = false;
         }//if
 
-        if (txtIdDonador.getText().trim().length() > 10) {
-            JOptionPane.showMessageDialog(this, "ID Donador debe tener máximo 10 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        if (txtPrimerApellido.getText().trim().isEmpty()) {
+            mensaje.append("Primer Apellido es obligatorio\n");
+            valido = false;
         }//if
 
-        if (txtNumeroVivienda.getText().trim().length() > 5) {
-            JOptionPane.showMessageDialog(this, "Número Vivienda debe tener máximo 5 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        if (txtTelefono.getText().trim().isEmpty()) {
+            mensaje.append("Teléfono es obligatorio\n");
+            valido = false;
+        } else if (!txtTelefono.getText().trim().matches("\\d+")) {
+            mensaje.append("El teléfono debe contener solo números\n");
+            valido = false;
+        }//Else if
+
+        if (txtNumeroVivienda.getText().trim().isEmpty()) {
+            mensaje.append("Número Vivienda es obligatorio\n");
+            valido = false;
+        } else if (txtNumeroVivienda.getText().trim().length() > 5) {
+            mensaje.append("Número Vivienda debe tener máximo 5 caracteres\n");
+            valido = false;
         }//if
 
-        if (txtCodigoPostal.getText().trim().length() > 6) {
-            JOptionPane.showMessageDialog(this, "Código Postal debe tener máximo 6 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        if (txtCalle.getText().trim().isEmpty()) {
+            mensaje.append("Calle es obligatoria\n");
+            valido = false;
         }//if
 
-        return true;
-    }//validarCampoObligatorio
+        if (txtColonia.getText().trim().isEmpty()) {
+            mensaje.append("Colonia es obligatoria\n");
+            valido = false;
+        }//if
+
+        if (txtCodigoPostal.getText().trim().isEmpty()) {
+            mensaje.append("Código Postal es obligatorio\n");
+            valido = false;
+        } else if (txtCodigoPostal.getText().trim().length() > 6) {
+            mensaje.append("Código Postal debe tener máximo 6 caracteres\n");
+            valido = false;
+        }//else if
+
+        if (txtPais.getText().trim().isEmpty()) {
+            mensaje.append("País es obligatorio\n");
+            valido = false;
+        }//if
+
+        if (txtCategoria.getText().trim().isEmpty()) {
+            mensaje.append("Categoría es obligatoria\n");
+            valido = false;
+        }//if
+
+        if (txtAñoGraduacion.getText().trim().isEmpty()) {
+            mensaje.append("Año de Graduación es obligatorio\n");
+            valido = false;
+        } else if (!txtAñoGraduacion.getText().trim().matches("\\d+")) {
+            mensaje.append("El año de graduación debe contener solo números\n");
+            valido = false;
+        }//Else if
+
+        if (!valido) {
+            JOptionPane.showMessageDialog(this, mensaje.toString(), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }//if
+        return valido;
+    }//validarCampos
 
     private int parseAñoGraduacion() {
         String añoText = txtAñoGraduacion.getText().trim();
@@ -528,32 +539,31 @@ public class ABCCDonadores extends JInternalFrame {
             return año;
         } catch (NumberFormatException ex) {
             throw new NumberFormatException("El año de graduación debe ser un número válido: " + ex.getMessage());
-        }//Catcg
+        }//Catch
 
-    }//parseAño
+    }//Añograd
 
     private void alta() {
         try {
-            if (!validarCamposObligatorios())
-                return;
+            if (!validarCamposObligatorios()) return;
             int añoGraduacion = parseAñoGraduacion();
 
             Donador donador = new Donador(
                     txtIdDonador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtTelefono.getText().trim(),
                     txtNumeroVivienda.getText().trim(),
                     txtCalle.getText().trim(),
                     txtColonia.getText().trim(),
-                    txtMunicipioCiudad.getText().trim(),
+                    txtMunicipioCiudad.getText().trim().isEmpty() ? null : txtMunicipioCiudad.getText().trim(),
                     txtCodigoPostal.getText().trim(),
-                    txtEstado.getText().trim(),
+                    txtEstado.getText().trim().isEmpty() ? null : txtEstado.getText().trim(),
                     txtPais.getText().trim(),
                     txtCategoria.getText().trim(),
                     añoGraduacion,
-                    txtNombreConyuge.getText().trim(),
+                    txtNombreConyuge.getText().trim().isEmpty() ? null : txtNombreConyuge.getText().trim(),
                     txtIdCirculo.getText().trim().isEmpty() ? null : txtIdCirculo.getText().trim(),
                     txtIdCoordinador.getText().trim().isEmpty() ? null : txtIdCoordinador.getText().trim(),
                     txtIdLlamador.getText().trim().isEmpty() ? null : txtIdLlamador.getText().trim()
@@ -565,31 +575,24 @@ public class ABCCDonadores extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al dar de alta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        }//Cacth
+        }//catch
 
     }//alta
 
     private void baja() {
-        String idDonador = null;
+        String idDonador = txtIdDonador.getText().trim();
         int filaSeleccionada = tablaDonadores.getSelectedRow();
         if (filaSeleccionada != -1) {
             idDonador = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
-        } else {
-            if (txtIdDonador.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del donador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
-            }//if
-            idDonador = txtIdDonador.getText().trim();
-        }//else
+        } else if (idDonador.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del donador o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//Else if
 
         int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el donador con ID " + idDonador + "?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) {
-            return;
-        }//if
+        if (confirm != JOptionPane.YES_OPTION) return;
 
         try {
             donadorDAO.baja(idDonador);
@@ -600,6 +603,7 @@ public class ABCCDonadores extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Error al dar de baja: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }//catch
+
     }//baja
 
     private void cambio() {
@@ -611,18 +615,18 @@ public class ABCCDonadores extends JInternalFrame {
                     txtIdDonador.getText().trim(),
                     txtNombre.getText().trim(),
                     txtPrimerApellido.getText().trim(),
-                    txtSegundoApellido.getText().trim(),
+                    txtSegundoApellido.getText().trim().isEmpty() ? null : txtSegundoApellido.getText().trim(),
                     txtTelefono.getText().trim(),
                     txtNumeroVivienda.getText().trim(),
                     txtCalle.getText().trim(),
                     txtColonia.getText().trim(),
-                    txtMunicipioCiudad.getText().trim(),
+                    txtMunicipioCiudad.getText().trim().isEmpty() ? null : txtMunicipioCiudad.getText().trim(),
                     txtCodigoPostal.getText().trim(),
-                    txtEstado.getText().trim(),
+                    txtEstado.getText().trim().isEmpty() ? null : txtEstado.getText().trim(),
                     txtPais.getText().trim(),
                     txtCategoria.getText().trim(),
                     añoGraduacion,
-                    txtNombreConyuge.getText().trim(),
+                    txtNombreConyuge.getText().trim().isEmpty() ? null : txtNombreConyuge.getText().trim(),
                     txtIdCirculo.getText().trim().isEmpty() ? null : txtIdCirculo.getText().trim(),
                     txtIdCoordinador.getText().trim().isEmpty() ? null : txtIdCoordinador.getText().trim(),
                     txtIdLlamador.getText().trim().isEmpty() ? null : txtIdLlamador.getText().trim()
@@ -631,14 +635,12 @@ public class ABCCDonadores extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Cambio exitoso", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTodosLosDonadores();
             reestablecer();
-
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }//cacth
+        }//Catch
 
     }//Cambio
 
@@ -648,21 +650,22 @@ public class ABCCDonadores extends JInternalFrame {
                 JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del donador", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
-
             Donador donador = donadorDAO.consulta(txtIdDonador.getText().trim());
             if (donador != null) {
                 mostrarDonador(donador);
+                List<Donador> donadores = List.of(donador);
+                actualizarTabla(donadores);
                 JOptionPane.showMessageDialog(this, "Consulta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Donador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
-            }//Else
+            }//else
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }//catch
 
-    }//consultaPorId
+    }//consultaPorID
 
     private void mostrarDonador(Donador donador) {
         txtIdDonador.setText(donador.getIdDonador());
@@ -683,7 +686,7 @@ public class ABCCDonadores extends JInternalFrame {
         txtIdCirculo.setText(donador.getIdCirculo() != null ? donador.getIdCirculo() : "");
         txtIdCoordinador.setText(donador.getIdCoordinador() != null ? donador.getIdCoordinador() : "");
         txtIdLlamador.setText(donador.getIdLlamador() != null ? donador.getIdLlamador() : "");
-    }//mostrarDonadores
+    }//mostrarDonador
 
     private void reestablecer() {
         txtIdDonador.setText("");
@@ -705,7 +708,6 @@ public class ABCCDonadores extends JInternalFrame {
         txtIdCoordinador.setText("");
         txtIdLlamador.setText("");
         tablaDonadores.clearSelection();
-
     }//reestablecer
 
-}//ABCC Donadores
+}//ABCC Dondaors

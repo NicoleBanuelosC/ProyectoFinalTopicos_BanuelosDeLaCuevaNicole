@@ -27,7 +27,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
 
         setLayout(new BorderLayout());
 
-        JPanel panelCampos = new JPanel(new GridLayout(3, 2, 5, 5)); // Cambiado a 3 filas para incluir descripcion
+        JPanel panelCampos = new JPanel(new GridLayout(3, 2, 5, 5));
         panelCampos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         panelCampos.add(new JLabel("ID Círculo:"));
@@ -90,7 +90,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
                 Object[] fila = {
                         circulo.getIdCirculo(),
                         circulo.getNombre(),
-                        circulo.getDescripcion()
+                        circulo.getDescripcion() != null ? circulo.getDescripcion() : ""
                 };
                 tableModel.addRow(fila);
             }//for
@@ -98,8 +98,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Error al cargar círculos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }//Catch
-
-    }//CargarTodos
+    }//CargarTodosLosCicruclos
 
     private void cargarSeleccion() {
         int filaSeleccionada = tableCirculos.getSelectedRow();
@@ -115,7 +114,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
                 mostrarCirculo(circulo);
             } else {
                 JOptionPane.showMessageDialog(this, "Círculo no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
-            }//if else
+            }//Else
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al cargar el círculo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
@@ -124,12 +123,31 @@ public class ABCCCirculoDonativo extends JInternalFrame {
     }//cargarSeleccion
 
     private boolean validarCamposObligatorios() {
-        if (txtIdCirculo.getText().trim().isEmpty() ||
-                txtNombre.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Los campos ID Círculo y Nombre son obligatorios", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return false;
+        StringBuilder mensaje = new StringBuilder();
+        boolean valido = true;
+
+        if (txtIdCirculo.getText().trim().isEmpty()) {
+            mensaje.append("ID Círculo es obligatorio\n");
+            valido = false;
+
+        } else if (!txtIdCirculo.getText().trim().matches("\\d+")) {
+            mensaje.append("El ID Círculo debe contener solo números\n");
+            valido = false;
+
+        } else if (txtIdCirculo.getText().trim().length() > 10) {
+            mensaje.append("ID Círculo debe tener máximo 10 caracteres\n");
+            valido = false;
+        }//else if
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mensaje.append("Nombre es obligatorio\n");
+            valido = false;
         }//if
-        return true;
+
+        if (!valido) {
+            JOptionPane.showMessageDialog(this, mensaje.toString(), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }//if
+        return valido;
     }//validarCampos
 
     private void alta() {
@@ -139,7 +157,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
             CirculoDonativo circulo = new CirculoDonativo(
                     txtIdCirculo.getText().trim(),
                     txtNombre.getText().trim(),
-                    txtDescripcion.getText().trim()
+                    txtDescripcion.getText().trim().isEmpty() ? null : txtDescripcion.getText().trim()
             );
             circuloDAO.alta(circulo);
             JOptionPane.showMessageDialog(this, "Alta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -148,23 +166,23 @@ public class ABCCCirculoDonativo extends JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al dar de alta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//Catch
-
-    }//Alta
+        }//Catcg
+    }//alta
 
     private void baja() {
-        String idCirculo = null;
+        String idCirculo = txtIdCirculo.getText().trim();
         int filaSeleccionada = tableCirculos.getSelectedRow();
         if (filaSeleccionada != -1) {
             idCirculo = tableModel.getValueAt(filaSeleccionada, 0).toString();
-        } else {
-            if (txtIdCirculo.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del círculo o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
-            }//if
+        } else if (idCirculo.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del círculo o seleccione uno de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//else fi
 
-            idCirculo = txtIdCirculo.getText().trim();
-        }//else
+        if (!idCirculo.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "El ID Círculo debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
 
         int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el círculo con ID " + idCirculo + "?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
@@ -180,7 +198,6 @@ public class ABCCCirculoDonativo extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Error al dar de baja: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }//Catch
-
     }//baja
 
     private void cambio() {
@@ -190,7 +207,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
             CirculoDonativo circulo = new CirculoDonativo(
                     txtIdCirculo.getText().trim(),
                     txtNombre.getText().trim(),
-                    txtDescripcion.getText().trim()
+                    txtDescripcion.getText().trim().isEmpty() ? null : txtDescripcion.getText().trim()
             );
             circuloDAO.cambio(circulo);
             JOptionPane.showMessageDialog(this, "Cambio exitoso", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -201,33 +218,47 @@ public class ABCCCirculoDonativo extends JInternalFrame {
             ex.printStackTrace();
         }//Catch
 
-    }//Cambio
+    }//cambio
 
     private void consultaPorId() {
         try {
-            if (txtIdCirculo.getText().trim().isEmpty()) {
+            String idCirculo = txtIdCirculo.getText().trim();
+            if (idCirculo.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor, ingrese el ID del círculo", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }//if
-            CirculoDonativo circulo = circuloDAO.consulta(txtIdCirculo.getText().trim());
+            if (!idCirculo.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "El ID Círculo debe contener solo números", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }//if
 
+            CirculoDonativo circulo = circuloDAO.consulta(idCirculo);
             if (circulo != null) {
                 mostrarCirculo(circulo);
+                List<CirculoDonativo> circulos = List.of(circulo);
+                tableModel.setRowCount(0);
+                for (CirculoDonativo c : circulos) {
+                    Object[] fila = {
+                            c.getIdCirculo(),
+                            c.getNombre(),
+                            c.getDescripcion() != null ? c.getDescripcion() : ""
+                    };
+                    tableModel.addRow(fila);
+                }//For
                 JOptionPane.showMessageDialog(this, "Consulta exitosa", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Círculo no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
-            }//else
+            }//Else
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//catch
-
-    }//ConsultaPorID
+        }//Catch
+    }//consultarPorID
 
     private void mostrarCirculo(CirculoDonativo circulo) {
         txtIdCirculo.setText(circulo.getIdCirculo());
         txtNombre.setText(circulo.getNombre());
-        txtDescripcion.setText(circulo.getDescripcion());
+        txtDescripcion.setText(circulo.getDescripcion() != null ? circulo.getDescripcion() : "");
     }//mostrarCirculo
 
     private void reestablecer() {
@@ -235,6 +266,7 @@ public class ABCCCirculoDonativo extends JInternalFrame {
         txtNombre.setText("");
         txtDescripcion.setText("");
         tableCirculos.clearSelection();
-    }//Reestablecer
-
-}//ABCC CirculoDonativo
+        cargarTodosLosCirculos(); // recargar todos los círculos para mantener la tabla actualizada
+    }//Restablecer
+    
+}//ABCC CIrculo
