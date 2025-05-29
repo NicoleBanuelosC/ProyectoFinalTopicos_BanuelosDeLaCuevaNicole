@@ -2,9 +2,11 @@ package vista;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class MainScreen extends JFrame {
     private JDesktopPane desktopPane;
+    private JLabel imageLabel; //label para la imagen
 
     public MainScreen() {
         setTitle("Colecta de Universidad - Sistema de Gestión");
@@ -43,6 +45,46 @@ public class MainScreen extends JFrame {
         infoPanel.setBounds(50, 50, 800, 300);
         desktopPane.add(infoPanel, JLayeredPane.DEFAULT_LAYER);
 
+        imageLabel = new JLabel();
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/donadorMS.png"));
+            if (icon.getImage() != null) {
+                Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                imageLabel.setIcon(scaledIcon);
+                imageLabel.setOpaque(false);
+                imageLabel.setBounds(0, 0, 200, 200);
+                desktopPane.add(imageLabel, JLayeredPane.DEFAULT_LAYER - 1);
+                desktopPane.revalidate();
+                desktopPane.repaint();
+                System.out.println("Imagen cargada y escalada desde resources");
+            } else {
+                System.err.println("No se pudo cargar la imagen desde /imagenes/donadorMS.png");
+                File imageFile = new File("imagenes/donadorMS.png");
+                System.out.println("Intentando cargar desde: " + imageFile.getAbsolutePath());
+                if (imageFile.exists()) {
+                    icon = new ImageIcon(imageFile.getPath());
+                    Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                    ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                    imageLabel.setIcon(scaledIcon);
+                    imageLabel.setOpaque(false);
+                    imageLabel.setBounds(0, 0, 200, 200);
+                    desktopPane.add(imageLabel, JLayeredPane.DEFAULT_LAYER - 1);
+                    desktopPane.revalidate();
+                    desktopPane.repaint();
+                    System.out.println("Imagen cargada y escalada desde sistema de archivos");
+
+                } else {
+                    System.err.println("Archivo no encontrado: " + imageFile.getAbsolutePath());
+                    JOptionPane.showMessageDialog(this, "No se encontró la imagen: imagenes/donadorMS.png", "Error", JOptionPane.ERROR_MESSAGE);
+                }//else
+
+            }//else
+        } catch (Exception e) {
+            System.err.println("Error al cargar la imagen: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar la imagen: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }//catch
+
         JMenuBar menuBar = new JMenuBar();
         JMenu menuEntidades = new JMenu("E N T I D A D E S");
         menuEntidades.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -68,6 +110,18 @@ public class MainScreen extends JFrame {
                 infoPanel.setBounds(x, y, panelWidth, panelHeight);
                 infoPanel.revalidate();
                 infoPanel.repaint();
+
+                if (imageLabel.getIcon() != null) {
+                    int imgWidth = 200;
+                    int imgHeight = 200;
+                    int imgX = desktopPane.getWidth() - imgWidth - 10;
+                    int imgY = desktopPane.getHeight() - imgHeight - 10;
+                    imageLabel.setBounds(imgX, imgY, imgWidth, imgHeight);
+                    imageLabel.revalidate();
+                    imageLabel.repaint();
+                    System.out.println("Imagen reposicionada: x=" + imgX + ", y=" + imgY);
+                }//if
+
             }
         });
 
@@ -80,6 +134,17 @@ public class MainScreen extends JFrame {
             infoPanel.setBounds(x, y, panelWidth, panelHeight);
             infoPanel.revalidate();
             infoPanel.repaint();
+
+            if (imageLabel.getIcon() != null) {
+                int imgWidth = 200;
+                int imgHeight = 200;
+                int imgX = desktopPane.getWidth() - imgWidth - 10;
+                int imgY = desktopPane.getHeight() - imgHeight - 10;
+                imageLabel.setBounds(imgX, imgY, imgWidth, imgHeight);
+                imageLabel.revalidate();
+                imageLabel.repaint();
+                System.out.println("Imagen inicial: x=" + imgX + ", y=" + imgY);
+            }//if
         });
 
     }//public MainScreen
@@ -133,12 +198,12 @@ public class MainScreen extends JFrame {
             case "CirculoDonativo":
                 abccFrame = new ABCCCirculoDonativo();
                 break;
-           // case "Tienen_Donadores_Asistencia":
-               // abccFrame = new ABCCTienenDonadoresAsistencia();
-             //   break;
+            /*case "Tienen_Donadores_Asistencia":
+                abccFrame = new ABCCTienenDonadoresAsistencia();
+                break;*/
             default:
                 return;
-        }//sqitch
+        }//switch
 
         if (abccFrame != null) {
             abccFrame.setTitle(title);
@@ -149,18 +214,18 @@ public class MainScreen extends JFrame {
             } catch (java.beans.PropertyVetoException e) {
                 e.printStackTrace();
             }//catch
-        }//if
+        }
     }//abrirABCC
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }//Catch
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             new MainScreen();
         });
-    }//Void main
+    }//main
 
 }//MainScreen
