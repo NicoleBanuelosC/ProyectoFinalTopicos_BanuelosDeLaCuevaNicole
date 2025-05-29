@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-//Clase para la creación del login
+//clase para la creación del login
 public class Login extends JFrame {
     private JTextField txtUsuario;
     private JPasswordField txtPassword;
@@ -147,6 +147,7 @@ public class Login extends JFrame {
 
     }//Login
 
+    // L O G I N
     //User: nicol
     //Contraseña: 29091998
 

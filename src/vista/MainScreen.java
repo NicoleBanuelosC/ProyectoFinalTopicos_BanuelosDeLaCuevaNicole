@@ -113,7 +113,7 @@ public class MainScreen extends JFrame {
 
         switch (entidad) {
             case "Donadores":
-                abccFrame = new ABCCDonadores();
+                abccFrame = new ABCCDonadores(operacion);
                 break;
             case "Donativo":
                 abccFrame = new ABCCDonativo();

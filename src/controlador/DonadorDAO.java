@@ -10,4 +10,9 @@ public interface DonadorDAO {
     void cambio(Donador donador) throws SQLException;
     Donador consulta(String idDonador) throws SQLException;
     List<Donador> consultaTodos() throws SQLException;
+
+    List<Donador> consultaPorNombre(String nombre) throws SQLException;
+    List<Donador> consultaPorPrimerApellido(String primerApellido) throws SQLException;
+    List<Donador> consultaPorTelefono(String telefono) throws SQLException;
+
 }//DonadorDAO
