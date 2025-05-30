@@ -11,9 +11,8 @@ public class DonadorDAOImpl implements DonadorDAO {
 
     public DonadorDAOImpl() {
         this.dbConnection = ConexionBD.getInstance();
-    }//public DAOImpl
+    }//public
 
-    //crear un objeto Donador desde un ResultSet
     private Donador crearDonadorDesdeResultSet(ResultSet rs) throws SQLException {
         return new Donador(
                 rs.getString("IdDonador"),
@@ -31,11 +30,11 @@ public class DonadorDAOImpl implements DonadorDAO {
                 rs.getString("categoria"),
                 rs.getInt("añoGraduacion"),
                 rs.getString("nombreConyuge"),
-                rs.getString("IdCirculo"),
-                rs.getString("IdCoordinador"),
-                rs.getString("IdLlamador")
+                rs.getString("txtIdCirculo"),
+                rs.getString("txtIdCoordinador"),
+                rs.getString("txtIdLlamador")
         );
-    }//crearDonadorDesdeResultSet
+    }//cerrarDesdeResultSet
 
     @Override
     public void alta(Donador donador) throws SQLException {
@@ -43,7 +42,7 @@ public class DonadorDAOImpl implements DonadorDAO {
         PreparedStatement pstmt = null;
         try {
             conn = dbConnection.getConnection();
-            String query = "INSERT INTO donadores (IdDonador, nombre, PrimerApellido, SegundoApellido, telefono, numeroVivienda, calle, colonia, municipioCiudad, codigoPostal, estado, pais, categoria, añoGraduacion, nombreConyuge, IdCirculo, IdCoordinador, IdLlamador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO donadores (IdDonador, nombre, PrimerApellido, SegundoApellido, telefono, numeroVivienda, calle, colonia, municipioCiudad, codigoPostal, estado, pais, categoria, añoGraduacion, nombreConyuge, txtIdCirculo, txtIdCoordinador, txtIdLlamador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             pstmt = conn.prepareStatement(query);
             pstmt.setString(1, donador.getIdDonador());
             pstmt.setString(2, donador.getNombre());
@@ -64,11 +63,12 @@ public class DonadorDAOImpl implements DonadorDAO {
             pstmt.setString(17, donador.getIdCoordinador());
             pstmt.setString(18, donador.getIdLlamador());
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Error al dar de alta el donador con ID " + donador.getIdDonador() + ": " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
         }//finally
-
-    }//Alta
+    }//alta
 
     @Override
     public void baja(String idDonador) throws SQLException {
@@ -81,11 +81,13 @@ public class DonadorDAOImpl implements DonadorDAO {
             pstmt.setString(1, idDonador);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new SQLException("Donador no encontrado");
-            }//if
+                throw new SQLException("Donador con ID " + idDonador + " no encontrado");
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al dar de baja el donador con ID " + idDonador + ": " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
-        }//Finanly
+        }//finally
     }//baja
 
     @Override
@@ -94,7 +96,7 @@ public class DonadorDAOImpl implements DonadorDAO {
         PreparedStatement pstmt = null;
         try {
             conn = dbConnection.getConnection();
-            String query = "UPDATE donadores SET nombre = ?, PrimerApellido = ?, SegundoApellido = ?, telefono = ?, numeroVivienda = ?, calle = ?, colonia = ?, municipioCiudad = ?, codigoPostal = ?, estado = ?, pais = ?, categoria = ?, añoGraduacion = ?, nombreConyuge = ?, IdCirculo = ?, IdCoordinador = ?, IdLlamador = ? WHERE IdDonador = ?";
+            String query = "UPDATE donadores SET nombre = ?, PrimerApellido = ?, SegundoApellido = ?, telefono = ?, numeroVivienda = ?, calle = ?, colonia = ?, municipioCiudad = ?, codigoPostal = ?, estado = ?, pais = ?, categoria = ?, añoGraduacion = ?, nombreConyuge = ?, txtIdCirculo = ?, txtIdCoordinador = ?, txtIdLlamador = ? WHERE IdDonador = ?";
             pstmt = conn.prepareStatement(query);
             pstmt.setString(1, donador.getNombre());
             pstmt.setString(2, donador.getPrimerApellido());
@@ -116,14 +118,16 @@ public class DonadorDAOImpl implements DonadorDAO {
             pstmt.setString(18, donador.getIdDonador());
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new SQLException("Donador no encontrado");
+                throw new SQLException("Donador con ID " + donador.getIdDonador() + " no encontrado");
             }//if
 
+        } catch (SQLException e) {
+            throw new SQLException("Error al actualizar el donador con ID " + donador.getIdDonador() + ": " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
         }//finally
 
-    }//cambio
+    }//Cambio
 
     @Override
     public Donador consulta(String idDonador) throws SQLException {
@@ -140,10 +144,12 @@ public class DonadorDAOImpl implements DonadorDAO {
                 return crearDonadorDesdeResultSet(rs);
             } else {
                 return null;
-            }//else
+            }//if
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar el donador con ID " + idDonador + ": " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//finally
+        }//Finally
 
     }//consulta
 
@@ -162,10 +168,11 @@ public class DonadorDAOImpl implements DonadorDAO {
                 donadores.add(crearDonadorDesdeResultSet(rs));
             }//while
             return donadores;
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar todos los donadores: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
         }//finally
-
     }//consultaTodos
 
     @Override
@@ -184,10 +191,11 @@ public class DonadorDAOImpl implements DonadorDAO {
                 donadores.add(crearDonadorDesdeResultSet(rs));
             }//while
             return donadores;
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar donadores por nombre '" + nombre + "': " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//finally
-
+        }//catch
     }//consultaPorNombre
 
     @Override
@@ -204,13 +212,14 @@ public class DonadorDAOImpl implements DonadorDAO {
             rs = pstmt.executeQuery();
             while (rs.next()) {
                 donadores.add(crearDonadorDesdeResultSet(rs));
-            }//While
+            }
             return donadores;
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar donadores por primer apellido '" + primerApellido + "': " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
         }//finally
-
-    }//consultaPorPrimerap
+    }//consultaprimerap
 
     @Override
     public List<Donador> consultaPorTelefono(String telefono) throws SQLException {
@@ -228,10 +237,12 @@ public class DonadorDAOImpl implements DonadorDAO {
                 donadores.add(crearDonadorDesdeResultSet(rs));
             }//while
             return donadores;
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar donadores por teléfono '" + telefono + "': " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//finally
+        }//Finally
 
-    }//consultaPorTelefono
+    }//consultatelefino
 
-}//DAOImpl
+}//DonadorDAOImpl
