@@ -7,43 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DonadorDAOImpl implements DonadorDAO {
-    private final ConexionBD dbConnection;
+    private ConexionBD dbConnection;
 
     public DonadorDAOImpl() {
         this.dbConnection = ConexionBD.getInstance();
-    }//public
-
-    private Donador crearDonadorDesdeResultSet(ResultSet rs) throws SQLException {
-        return new Donador(
-                rs.getString("IdDonador"),
-                rs.getString("nombre"),
-                rs.getString("PrimerApellido"),
-                rs.getString("SegundoApellido"),
-                rs.getString("telefono"),
-                rs.getString("numeroVivienda"),
-                rs.getString("calle"),
-                rs.getString("colonia"),
-                rs.getString("municipioCiudad"),
-                rs.getString("codigoPostal"),
-                rs.getString("estado"),
-                rs.getString("pais"),
-                rs.getString("categoria"),
-                rs.getInt("añoGraduacion"),
-                rs.getString("nombreConyuge"),
-                rs.getString("txtIdCirculo"),
-                rs.getString("txtIdCoordinador"),
-                rs.getString("txtIdLlamador")
-        );
-    }//cerrarDesdeResultSet
+    }
 
     @Override
     public void alta(Donador donador) throws SQLException {
-        Connection conn = null;
+        String sql = "INSERT INTO donadores (IdDonador, nombre, primerApellido, segundoApellido, telefono, " +
+                "numeroVivienda, calle, colonia, municipioCiudad, codigoPostal, estado, pais, " +
+                "categoria, añoGraduacion, nombreConyuge, txtIdCirculo, txtIdCoordinador, txtIdLlamador) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement pstmt = null;
         try {
-            conn = dbConnection.getConnection();
-            String query = "INSERT INTO donadores (IdDonador, nombre, PrimerApellido, SegundoApellido, telefono, numeroVivienda, calle, colonia, municipioCiudad, codigoPostal, estado, pais, categoria, añoGraduacion, nombreConyuge, txtIdCirculo, txtIdCoordinador, txtIdLlamador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            pstmt = conn.prepareStatement(query);
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, donador.getIdDonador());
             pstmt.setString(2, donador.getNombre());
             pstmt.setString(3, donador.getPrimerApellido());
@@ -64,40 +43,41 @@ public class DonadorDAOImpl implements DonadorDAO {
             pstmt.setString(18, donador.getIdLlamador());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new SQLException("Error al dar de alta el donador con ID " + donador.getIdDonador() + ": " + e.getMessage(), e);
+            throw new SQLException("Error al registrar donador: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
-        }//finally
-    }//alta
+        }
+    }
 
     @Override
     public void baja(String idDonador) throws SQLException {
-        Connection conn = null;
+        String sql = "DELETE FROM donadores WHERE IdDonador = ?";
         PreparedStatement pstmt = null;
         try {
-            conn = dbConnection.getConnection();
-            String query = "DELETE FROM donadores WHERE IdDonador = ?";
-            pstmt = conn.prepareStatement(query);
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, idDonador);
-            int rows = pstmt.executeUpdate();
-            if (rows == 0) {
-                throw new SQLException("Donador con ID " + idDonador + " no encontrado");
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No se encontró el donador con ID: " + idDonador);
             }
         } catch (SQLException e) {
-            throw new SQLException("Error al dar de baja el donador con ID " + idDonador + ": " + e.getMessage(), e);
+            throw new SQLException("Error al eliminar donador: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
-        }//finally
-    }//baja
+        }
+    }
 
     @Override
     public void cambio(Donador donador) throws SQLException {
-        Connection conn = null;
+        String sql = "UPDATE donadores SET nombre = ?, primerApellido = ?, segundoApellido = ?, telefono = ?, " +
+                "numeroVivienda = ?, calle = ?, colonia = ?, municipioCiudad = ?, codigoPostal = ?, " +
+                "estado = ?, pais = ?, categoria = ?, añoGraduacion = ?, nombreConyuge = ?, " +
+                "txtIdCirculo = ?, txtIdCoordinador = ?, txtIdLlamador = ? WHERE IdDonador = ?";
         PreparedStatement pstmt = null;
         try {
-            conn = dbConnection.getConnection();
-            String query = "UPDATE donadores SET nombre = ?, PrimerApellido = ?, SegundoApellido = ?, telefono = ?, numeroVivienda = ?, calle = ?, colonia = ?, municipioCiudad = ?, codigoPostal = ?, estado = ?, pais = ?, categoria = ?, añoGraduacion = ?, nombreConyuge = ?, txtIdCirculo = ?, txtIdCoordinador = ?, txtIdLlamador = ? WHERE IdDonador = ?";
-            pstmt = conn.prepareStatement(query);
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, donador.getNombre());
             pstmt.setString(2, donador.getPrimerApellido());
             pstmt.setString(3, donador.getSegundoApellido());
@@ -116,133 +96,222 @@ public class DonadorDAOImpl implements DonadorDAO {
             pstmt.setString(16, donador.getIdCoordinador());
             pstmt.setString(17, donador.getIdLlamador());
             pstmt.setString(18, donador.getIdDonador());
-            int rows = pstmt.executeUpdate();
-            if (rows == 0) {
-                throw new SQLException("Donador con ID " + donador.getIdDonador() + " no encontrado");
-            }//if
-
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No se encontró el donador con ID: " + donador.getIdDonador());
+            }
         } catch (SQLException e) {
-            throw new SQLException("Error al actualizar el donador con ID " + donador.getIdDonador() + ": " + e.getMessage(), e);
+            throw new SQLException("Error al actualizar donador: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(null, null, pstmt);
-        }//finally
-
-    }//Cambio
+        }
+    }
 
     @Override
     public Donador consulta(String idDonador) throws SQLException {
-        Connection conn = null;
+        String sql = "SELECT * FROM donadores WHERE IdDonador = ?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+        Donador donador = null;
         try {
-            conn = dbConnection.getConnection();
-            String query = "SELECT * FROM donadores WHERE IdDonador = ?";
-            pstmt = conn.prepareStatement(query);
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, idDonador);
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                return crearDonadorDesdeResultSet(rs);
-            } else {
-                return null;
-            }//if
+                donador = new Donador(
+                        rs.getString("IdDonador"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getString("segundoApellido"),
+                        rs.getString("telefono"),
+                        rs.getString("numeroVivienda"),
+                        rs.getString("calle"),
+                        rs.getString("colonia"),
+                        rs.getString("municipioCiudad"),
+                        rs.getString("codigoPostal"),
+                        rs.getString("estado"),
+                        rs.getString("pais"),
+                        rs.getString("categoria"),
+                        rs.getInt("añoGraduacion"),
+                        rs.getString("nombreConyuge"),
+                        rs.getString("txtIdCirculo"),
+                        rs.getString("txtIdCoordinador"),
+                        rs.getString("txtIdLlamador")
+                );
+            }
         } catch (SQLException e) {
-            throw new SQLException("Error al consultar el donador con ID " + idDonador + ": " + e.getMessage(), e);
+            throw new SQLException("Error al consultar donador: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//Finally
-
-    }//consulta
+        }
+        return donador;
+    }
 
     @Override
-    public List<Donador> consultaTodos() throws SQLException {
-        Connection conn = null;
+    public List<Donador> consultaPorNombre(String nombre) throws SQLException {
+        String sql = "SELECT * FROM donadores WHERE nombre LIKE ?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         List<Donador> donadores = new ArrayList<>();
         try {
-            conn = dbConnection.getConnection();
-            String query = "SELECT * FROM donadores";
-            pstmt = conn.prepareStatement(query);
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + nombre + "%");
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                donadores.add(crearDonadorDesdeResultSet(rs));
-            }//while
-            return donadores;
+                Donador donador = new Donador(
+                        rs.getString("IdDonador"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getString("segundoApellido"),
+                        rs.getString("telefono"),
+                        rs.getString("numeroVivienda"),
+                        rs.getString("calle"),
+                        rs.getString("colonia"),
+                        rs.getString("municipioCiudad"),
+                        rs.getString("codigoPostal"),
+                        rs.getString("estado"),
+                        rs.getString("pais"),
+                        rs.getString("categoria"),
+                        rs.getInt("añoGraduacion"),
+                        rs.getString("nombreConyuge"),
+                        rs.getString("txtIdCirculo"),
+                        rs.getString("txtIdCoordinador"),
+                        rs.getString("txtIdLlamador")
+                );
+                donadores.add(donador);
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar por nombre: " + e.getMessage(), e);
+        } finally {
+            dbConnection.cerrarRecursos(rs, null, pstmt);
+        }
+        return donadores;
+    }
+
+    @Override
+    public List<Donador> consultaPorPrimerApellido(String primerApellido) throws SQLException {
+        String sql = "SELECT * FROM donadores WHERE primerApellido LIKE ?";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Donador> donadores = new ArrayList<>();
+        try {
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + primerApellido + "%");
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Donador donador = new Donador(
+                        rs.getString("IdDonador"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getString("segundoApellido"),
+                        rs.getString("telefono"),
+                        rs.getString("numeroVivienda"),
+                        rs.getString("calle"),
+                        rs.getString("colonia"),
+                        rs.getString("municipioCiudad"),
+                        rs.getString("codigoPostal"),
+                        rs.getString("estado"),
+                        rs.getString("pais"),
+                        rs.getString("categoria"),
+                        rs.getInt("añoGraduacion"),
+                        rs.getString("nombreConyuge"),
+                        rs.getString("txtIdCirculo"),
+                        rs.getString("txtIdCoordinador"),
+                        rs.getString("txtIdLlamador")
+                );
+                donadores.add(donador);
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar por primer apellido: " + e.getMessage(), e);
+        } finally {
+            dbConnection.cerrarRecursos(rs, null, pstmt);
+        }
+        return donadores;
+    }
+
+    @Override
+    public List<Donador> consultaPorTelefono(String telefono) throws SQLException {
+        String sql = "SELECT * FROM donadores WHERE telefono LIKE ?";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Donador> donadores = new ArrayList<>();
+        try {
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + telefono + "%");
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Donador donador = new Donador(
+                        rs.getString("IdDonador"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getString("segundoApellido"),
+                        rs.getString("telefono"),
+                        rs.getString("numeroVivienda"),
+                        rs.getString("calle"),
+                        rs.getString("colonia"),
+                        rs.getString("municipioCiudad"),
+                        rs.getString("codigoPostal"),
+                        rs.getString("estado"),
+                        rs.getString("pais"),
+                        rs.getString("categoria"),
+                        rs.getInt("añoGraduacion"),
+                        rs.getString("nombreConyuge"),
+                        rs.getString("txtIdCirculo"),
+                        rs.getString("txtIdCoordinador"),
+                        rs.getString("txtIdLlamador")
+                );
+                donadores.add(donador);
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error al consultar por teléfono: " + e.getMessage(), e);
+        } finally {
+            dbConnection.cerrarRecursos(rs, null, pstmt);
+        }
+        return donadores;
+    }
+
+    @Override
+    public List<Donador> consultaTodos() throws SQLException {
+        String sql = "SELECT * FROM donadores";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Donador> donadores = new ArrayList<>();
+        try {
+            Connection conn = dbConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Donador donador = new Donador(
+                        rs.getString("IdDonador"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getString("segundoApellido"),
+                        rs.getString("telefono"),
+                        rs.getString("numeroVivienda"),
+                        rs.getString("calle"),
+                        rs.getString("colonia"),
+                        rs.getString("municipioCiudad"),
+                        rs.getString("codigoPostal"),
+                        rs.getString("estado"),
+                        rs.getString("pais"),
+                        rs.getString("categoria"),
+                        rs.getInt("añoGraduacion"),
+                        rs.getString("nombreConyuge"),
+                        rs.getString("txtIdCirculo"),
+                        rs.getString("txtIdCoordinador"),
+                        rs.getString("txtIdLlamador")
+                );
+                donadores.add(donador);
+            }
         } catch (SQLException e) {
             throw new SQLException("Error al consultar todos los donadores: " + e.getMessage(), e);
         } finally {
             dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//finally
-    }//consultaTodos
-
-    @Override
-    public List<Donador> consultaPorNombre(String nombre) throws SQLException {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<Donador> donadores = new ArrayList<>();
-        try {
-            conn = dbConnection.getConnection();
-            String query = "SELECT * FROM donadores WHERE nombre LIKE ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "%" + nombre + "%");
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                donadores.add(crearDonadorDesdeResultSet(rs));
-            }//while
-            return donadores;
-        } catch (SQLException e) {
-            throw new SQLException("Error al consultar donadores por nombre '" + nombre + "': " + e.getMessage(), e);
-        } finally {
-            dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//catch
-    }//consultaPorNombre
-
-    @Override
-    public List<Donador> consultaPorPrimerApellido(String primerApellido) throws SQLException {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<Donador> donadores = new ArrayList<>();
-        try {
-            conn = dbConnection.getConnection();
-            String query = "SELECT * FROM donadores WHERE PrimerApellido LIKE ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "%" + primerApellido + "%");
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                donadores.add(crearDonadorDesdeResultSet(rs));
-            }
-            return donadores;
-        } catch (SQLException e) {
-            throw new SQLException("Error al consultar donadores por primer apellido '" + primerApellido + "': " + e.getMessage(), e);
-        } finally {
-            dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//finally
-    }//consultaprimerap
-
-    @Override
-    public List<Donador> consultaPorTelefono(String telefono) throws SQLException {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<Donador> donadores = new ArrayList<>();
-        try {
-            conn = dbConnection.getConnection();
-            String query = "SELECT * FROM donadores WHERE telefono LIKE ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "%" + telefono + "%");
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                donadores.add(crearDonadorDesdeResultSet(rs));
-            }//while
-            return donadores;
-        } catch (SQLException e) {
-            throw new SQLException("Error al consultar donadores por teléfono '" + telefono + "': " + e.getMessage(), e);
-        } finally {
-            dbConnection.cerrarRecursos(rs, null, pstmt);
-        }//Finally
-
-    }//consultatelefino
-
-}//DonadorDAOImpl
+        }
+        return donadores;
+    }
+}
