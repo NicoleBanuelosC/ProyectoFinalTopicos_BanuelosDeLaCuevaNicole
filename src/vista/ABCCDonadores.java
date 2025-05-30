@@ -242,7 +242,27 @@ public class ABCCDonadores extends JInternalFrame {
         btnCargarSeleccion.setBackground(grislobo);
         btnCargarSeleccion.setForeground(Color.BLACK);
         btnCargarSeleccion.setFont(new Font("SansSerif", Font.BOLD, 12));
-        btnCargarSeleccion.addActionListener(e -> cargarSeleccion());
+        btnCargarSeleccion.addActionListener(e -> {
+            String idDesdeCampoTexto = txtIdDonador.getText().trim(); // obtener el ID del JTextField
+
+            if (!idDesdeCampoTexto.isEmpty()) {
+                try {
+                    Donador donador = donadorDAO.consulta(idDesdeCampoTexto);
+                    if (donador != null) {
+                        mostrarDonador(donador);
+                        JOptionPane.showMessageDialog(ABCCDonadores.this, "Donador cargado exitosamente por ID.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(ABCCDonadores.this, "No se encontró ningún donador con el ID: " + idDesdeCampoTexto + ".", "Donador no encontrado", JOptionPane.INFORMATION_MESSAGE);
+                        reestablecer();
+                    }//else
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(ABCCDonadores.this, "Error de base de datos al cargar donador por ID: " + ex.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }//Catch
+            } else {
+                cargarSeleccionDesdeTabla();
+            }//else
+        });
         panelBotones.add(btnCargarSeleccion);
 
         btnReestablecer = new JButton("Reestablecer");
@@ -527,10 +547,10 @@ public class ABCCDonadores extends JInternalFrame {
         }//Catch
     }//cargarTodos
 
-    private void cargarSeleccion() {
+    private void cargarSeleccionDesdeTabla() {
         int filaSeleccionada = tablaDonadores.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Por favor, seleccione un donador de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un donador de la tabla, o ingrese un ID en el campo de texto y use el botón 'Cargar Selección'.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }//if
 
@@ -540,15 +560,15 @@ public class ABCCDonadores extends JInternalFrame {
             if (donador != null) {
                 mostrarDonador(donador);
             } else {
-                JOptionPane.showMessageDialog(this, "Donador no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Donador no encontrado en la base de datos (problema de datos).", "Error", JOptionPane.ERROR_MESSAGE);
             }//Else
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar el donador: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar el donador desde la tabla: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-        }//Catch
+        }//catch
 
-    }//cargarSleccion
+    }//CargarSeleccionDesdeTabla
 
     private boolean validarCamposObligatorios() {
         StringBuilder mensaje = new StringBuilder();
