@@ -645,8 +645,8 @@ public class ABCCDonadores extends JInternalFrame {
             mensaje.append("Colonia es obligatoria\n");
             valido = false;
 
-        } else if (!txtColonia.getText().trim().matches("^[a-zA-Z0-9\\sáéíóúÁÉÍÓÚñÑ]*$")) {
-            mensaje.append("La colonia debe contener solo letras y números\n");
+        } else if (!txtColonia.getText().trim().matches("^[a-zA-Z\\sáéíóúÁÉÍÓÚñÑ]*$")) {
+            mensaje.append("La colonia debe contener solo letras\n");
             valido = false;
         }//Else if
 
