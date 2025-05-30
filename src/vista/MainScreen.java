@@ -45,6 +45,7 @@ public class MainScreen extends JFrame {
         infoPanel.setBounds(50, 50, 800, 300);
         desktopPane.add(infoPanel, JLayeredPane.DEFAULT_LAYER);
 
+        //agregar la imagen al MainScreen
         imageLabel = new JLabel();
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/donadorMS.png"));
